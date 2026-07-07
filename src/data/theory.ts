@@ -145,3 +145,13 @@ export function theoryChordMidis(root: string, intervals: number[]): number[] {
   const rootMidi = 48 + noteToPc(root);
   return intervals.map((s) => rootMidi + s);
 }
+
+/** 移調：把和弦名稱的根音移動 delta 個半音，保留後綴（Am7 +2 → Bm7） */
+export function transposeChordName(
+  name: string,
+  delta: number,
+  useFlats: boolean,
+): string {
+  const root = parseRoot(name);
+  return pcToName(noteToPc(root) + delta, useFlats) + name.slice(root.length);
+}

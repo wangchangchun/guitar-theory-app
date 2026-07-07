@@ -2,10 +2,21 @@ import { useEffect, useRef, useState } from "react";
 import type { Genre, Progression } from "../data/progressions";
 import { PROGRESSIONS } from "../data/progressions";
 import { findShapeForName } from "../data/chordLookup";
-import { playChord } from "../audio/audioEngine";
+import { noteToPc, transposeChordName } from "../data/theory";
+import { chordMidiNotes } from "../types/music";
+import {
+  getAudioTime,
+  hatAt,
+  kickAt,
+  noteAt,
+  playChord,
+  snareAt,
+  strumChordAt,
+} from "../audio/audioEngine";
 import { ChordDiagram } from "../components/fretboard/ChordDiagram";
 
 const GENRE_LABELS: Record<Genre, string> = {
+  jpop: "日系流行",
   rock: "經典搖滾",
   blues: "藍調",
   punk: "龐克",
@@ -13,55 +24,143 @@ const GENRE_LABELS: Record<Genre, string> = {
   metal: "金屬",
 };
 
+/** 移調器的 12 個調（實務常用拼法） */
+const KEY_OPTIONS = [
+  "C", "D♭", "D", "E♭", "E", "F", "F#", "G", "A♭", "A", "B♭", "B",
+];
+const useFlatsForKey = (key: string) => key.includes("♭") || key === "F";
+
+type RhythmId = "long" | "eight" | "sixteen" | "arp";
+
+interface StrumEvent {
+  /** 在 step 內的拍點位置（0 = 第一拍） */
+  t: number;
+  gain: number;
+  dir: "down" | "up";
+}
+
+const EIGHT_STRUMS: StrumEvent[] = Array.from({ length: 8 }, (_, k) => ({
+  t: k * 0.5,
+  gain: k % 2 === 0 ? 0.3 : 0.18,
+  dir: "down",
+}));
+
+// 16 Beat：每 2 拍一組「下 下 上 ・上 下 上」的十六分刷法
+const SIXTEEN_HALF: StrumEvent[] = [
+  { t: 0, gain: 0.3, dir: "down" },
+  { t: 0.5, gain: 0.18, dir: "down" },
+  { t: 0.75, gain: 0.14, dir: "up" },
+  { t: 1.25, gain: 0.14, dir: "up" },
+  { t: 1.5, gain: 0.2, dir: "down" },
+  { t: 1.75, gain: 0.14, dir: "up" },
+];
+
+const STRUM_PATTERNS: Record<Exclude<RhythmId, "arp">, StrumEvent[]> = {
+  long: [
+    { t: 0, gain: 0.3, dir: "down" },
+    { t: 2, gain: 0.22, dir: "down" },
+  ],
+  eight: EIGHT_STRUMS,
+  sixteen: [...SIXTEEN_HALF, ...SIXTEEN_HALF.map((e) => ({ ...e, t: e.t + 2 }))],
+};
+
+const RHYTHM_OPTIONS: { id: RhythmId; label: string }[] = [
+  { id: "long", label: "長音" },
+  { id: "eight", label: "8 Beat" },
+  { id: "sixteen", label: "16 Beat" },
+  { id: "arp", label: "琶音" },
+];
+
+/** 琶音順序：低→高→回到中間，循環 */
+const arpeggioSequence = (tones: number[]) =>
+  tones.length > 2 ? [...tones, ...tones.slice(1, -1).reverse()] : tones;
+
 /**
- * 歌曲進行：經典搖滾和弦進行資料庫，
- * 可依 BPM 循環播放、跟著亮起的小節換和弦。
+ * 歌曲進行：日系＋歐美經典和弦進行資料庫，
+ * 附 12 調移調器與節奏引擎（8/16 Beat、琶音、合成鼓組 backbeat）。
  */
 export function SongProgressionsPage() {
   const [selected, setSelected] = useState<Progression>(PROGRESSIONS[0]);
-  const [playingBar, setPlayingBar] = useState<number | null>(null);
+  const [keyName, setKeyName] = useState(PROGRESSIONS[0].keyRoot);
+  const [bpm, setBpm] = useState(PROGRESSIONS[0].bpm);
+  const [rhythm, setRhythm] = useState<RhythmId>("eight");
+  const [drumsOn, setDrumsOn] = useState(true);
+  const [playingStep, setPlayingStep] = useState<number | null>(null);
   const timerRef = useRef<number | null>(null);
   const activeRef = useRef(false);
+
+  // 移調後的 steps（delta = 0 時保留原名，才能用到資料庫的開放和弦按法）
+  const delta = (noteToPc(keyName) - noteToPc(selected.keyRoot) + 12) % 12;
+  const useFlats = useFlatsForKey(keyName);
+  const steps = selected.steps.map((s) =>
+    delta === 0 ? s : { ...s, chord: transposeChordName(s.chord, delta, useFlats) },
+  );
+  const uniqueChords = [...new Set(steps.map((s) => s.chord))];
 
   const stop = () => {
     activeRef.current = false;
     if (timerRef.current !== null) {
-      clearInterval(timerRef.current);
+      clearTimeout(timerRef.current);
       timerRef.current = null;
     }
-    setPlayingBar(null);
+    setPlayingStep(null);
   };
 
   const play = () => {
     stop();
     activeRef.current = true;
-    const barMs = (4 * 60 * 1000) / selected.bpm;
-    let bar = 0;
-    const tick = () => {
-      const index = bar % selected.chords.length;
-      const shape = findShapeForName(selected.chords[index]);
-      setPlayingBar(index);
-      playChord(shape, "strum");
-      // 第三拍補一刷，比較有律動感
-      window.setTimeout(() => {
-        if (activeRef.current) playChord(shape, "strum");
-      }, barMs / 2);
-      bar++;
+    const beatSec = 60 / bpm;
+    let idx = 0;
+    let when = getAudioTime() + 0.12;
+
+    const scheduleStep = () => {
+      if (!activeRef.current) return;
+      const i = idx % steps.length;
+      const step = steps[i];
+      const beats = step.beats ?? 4;
+      const shape = findShapeForName(step.chord);
+      setPlayingStep(i);
+
+      if (rhythm === "arp") {
+        const seq = arpeggioSequence(chordMidiNotes(shape));
+        const count = beats * 2; // 八分音符
+        for (let k = 0; k < count; k++) {
+          noteAt(seq[k % seq.length], when + k * beatSec * 0.5, 0.22);
+        }
+      } else {
+        for (const ev of STRUM_PATTERNS[rhythm]) {
+          if (ev.t < beats) strumChordAt(shape, when + ev.t * beatSec, ev.gain, ev.dir);
+        }
+      }
+
+      if (drumsOn) {
+        for (let b = 0; b < beats; b += 2) kickAt(when + b * beatSec);
+        for (let b = 1; b < beats; b += 2) snareAt(when + b * beatSec);
+        const hatStep = rhythm === "sixteen" ? 0.25 : rhythm === "eight" ? 0.5 : 1;
+        for (let t = 0; t < beats; t += hatStep) {
+          hatAt(when + t * beatSec, t % 1 === 0 ? 0.11 : 0.06);
+        }
+      }
+
+      const durMs = beats * beatSec * 1000;
+      when += beats * beatSec;
+      idx++;
+      timerRef.current = window.setTimeout(scheduleStep, durMs);
     };
-    tick();
-    timerRef.current = window.setInterval(tick, barMs);
+    scheduleStep();
   };
 
   const selectProgression = (p: Progression) => {
     stop();
     setSelected(p);
+    setKeyName(p.keyRoot);
+    setBpm(p.bpm);
   };
 
   // 離開頁面時停止播放
   useEffect(() => stop, []);
 
-  const isPlaying = playingBar !== null;
-  const uniqueChords = [...new Set(selected.chords)];
+  const isPlaying = playingStep !== null;
 
   return (
     <div className="flex flex-col gap-6 lg:flex-row">
@@ -84,8 +183,8 @@ export function SongProgressionsPage() {
               </span>
             </div>
             <p className="font-mono text-xs text-slate-400">
-              {p.romanNumerals.slice(0, 4).join(" – ")}
-              {p.romanNumerals.length > 4 && " …"}
+              {p.steps.slice(0, 4).map((s) => s.numeral).join(" – ")}
+              {p.steps.length > 4 && " …"}
             </p>
           </button>
         ))}
@@ -99,12 +198,88 @@ export function SongProgressionsPage() {
               {selected.title}
             </h2>
             <span className="text-sm text-slate-400">
-              {selected.key} 調 · {selected.bpm} BPM
+              {keyName}
+              {selected.keyQuality === "minor" ? "m" : ""} 調 · {bpm} BPM
             </span>
           </div>
           <p className="mb-4 text-sm leading-relaxed text-slate-300">
             {selected.description}
           </p>
+
+          {/* 移調器 */}
+          <div className="mb-3">
+            <span className="mb-1.5 block text-xs font-semibold text-slate-400">
+              Key（移調練習：先在原調練熟，再移到別的調）
+            </span>
+            <div className="flex flex-wrap gap-1.5">
+              {KEY_OPTIONS.map((k) => (
+                <button
+                  key={k}
+                  onClick={() => {
+                    stop();
+                    setKeyName(k);
+                  }}
+                  className={`w-10 rounded-lg py-1 font-mono text-sm font-semibold transition-colors ${
+                    keyName === k
+                      ? "bg-amber-500 text-slate-950"
+                      : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  }`}
+                >
+                  {k}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* 節奏控制 */}
+          <div className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <div className="flex gap-1.5">
+              {RHYTHM_OPTIONS.map((r) => (
+                <button
+                  key={r.id}
+                  onClick={() => {
+                    stop();
+                    setRhythm(r.id);
+                  }}
+                  className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
+                    rhythm === r.id
+                      ? "bg-amber-500 text-slate-950"
+                      : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  }`}
+                >
+                  {r.label}
+                </button>
+              ))}
+            </div>
+            <button
+              onClick={() => {
+                stop();
+                setDrumsOn(!drumsOn);
+              }}
+              className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
+                drumsOn
+                  ? "bg-slate-700 text-amber-300"
+                  : "bg-slate-800 text-slate-500"
+              }`}
+            >
+              🥁 鼓組 {drumsOn ? "開" : "關"}
+            </button>
+            <label className="flex items-center gap-2 text-xs text-slate-400">
+              BPM
+              <input
+                type="range"
+                min={60}
+                max={200}
+                value={bpm}
+                onChange={(e) => {
+                  stop();
+                  setBpm(Number(e.target.value));
+                }}
+                className="w-32 accent-amber-500"
+              />
+              <span className="w-8 font-mono text-slate-300">{bpm}</span>
+            </label>
+          </div>
 
           <div className="mb-5 flex items-center gap-3">
             <button
@@ -118,30 +293,31 @@ export function SongProgressionsPage() {
               {isPlaying ? "⏹ 停止" : "▶ 播放"}
             </button>
             <span className="text-xs text-slate-500">
-              一小節一個和弦，循環播放
+              Backbeat：小鼓固定在 2、4 拍；16 Beat 的 hi-hat 切十六分。
             </span>
           </div>
 
           {/* 小節時間軸 */}
           <div className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {selected.chords.map((chord, i) => (
+            {steps.map((step, i) => (
               <div
                 key={i}
                 className={`rounded-lg border px-3 py-2 text-center transition-colors ${
-                  playingBar === i
+                  playingStep === i
                     ? "border-amber-500 bg-amber-500/15"
                     : "border-slate-800 bg-slate-950/50"
                 }`}
               >
                 <p className="font-mono text-[10px] text-slate-500">
-                  {selected.romanNumerals[i]}
+                  {step.numeral}
+                  {step.beats && step.beats !== 4 ? ` · ${step.beats}拍` : ""}
                 </p>
                 <p
                   className={`font-bold ${
-                    playingBar === i ? "text-amber-300" : "text-slate-200"
+                    playingStep === i ? "text-amber-300" : "text-slate-200"
                   }`}
                 >
-                  {chord}
+                  {step.chord}
                 </p>
               </div>
             ))}
@@ -155,7 +331,7 @@ export function SongProgressionsPage() {
             {uniqueChords.map((chord) => {
               const shape = findShapeForName(chord);
               const activeChord =
-                playingBar !== null && selected.chords[playingBar] === chord;
+                playingStep !== null && steps[playingStep].chord === chord;
               return (
                 <button
                   key={chord}
