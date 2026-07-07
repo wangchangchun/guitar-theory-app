@@ -12,6 +12,11 @@ export interface ScaleDef {
   description: string;
   /** 搖滾情境下怎麼用 */
   usage: string;
+  /**
+   * 把位起點使用的音程（未指定則每個音階音各起一個把位）。
+   * 例如藍調音階沿用小調五聲的 5 個把位，♭5 不當起點。
+   */
+  positionAnchors?: number[];
 }
 
 export const SCALES: ScaleDef[] = [
@@ -59,6 +64,7 @@ export const SCALES: ScaleDef[] = [
     description:
       "小調五聲＋♭5「藍調音」（青色標記）：那個又髒又對味的半音，是藍調的靈魂。",
     usage: "藍調與藍調搖滾。♭5 當經過音滑過去最對味，別在上面停留太久。",
+    positionAnchors: [0, 3, 5, 7, 10],
   },
   {
     id: "dorian",

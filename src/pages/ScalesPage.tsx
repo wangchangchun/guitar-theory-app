@@ -16,10 +16,32 @@ export function ScalesPage() {
   const [root, setRoot] = useState("A");
   const [scaleId, setScaleId] = useState("minor-pentatonic");
   const [showDegrees, setShowDegrees] = useState(true);
+  const [position, setPosition] = useState<number | null>(null);
 
   const scale = SCALES.find((s) => s.id === scaleId)!;
   const rootPc = noteToPc(root);
   const tones = spellChordTones(root, scale.intervals);
+
+  // 把位：以第六弦上的每個把位錨點音為起點，第 1 把位從根音出發、
+  // 依琴格順序沿指板往上排列（音階指型每 12 格循環一次）
+  const anchorIntervals = scale.positionAnchors ?? scale.intervals;
+  const anchors = anchorIntervals
+    .map((s) => ({ interval: s, fret: (rootPc + s - 4 + 12) % 12 }))
+    .sort((a, b) => a.fret - b.fret);
+  const rootIdx = anchors.findIndex((a) => a.interval === 0);
+  const positions = anchors.map(
+    (_, i) => anchors[(rootIdx + i) % anchors.length],
+  );
+
+  const activePos = position !== null ? positions[position] : null;
+  const fretWindow = activePos
+    ? { from: Math.max(0, activePos.fret - 1), to: activePos.fret + 3 }
+    : null;
+
+  const selectScale = (id: string) => {
+    setScaleId(id);
+    setPosition(null);
+  };
 
   const playScale = () => {
     // 從低音把位的根音往上彈一個八度
@@ -59,7 +81,7 @@ export function ScalesPage() {
           {SCALES.map((s) => (
             <button
               key={s.id}
-              onClick={() => setScaleId(s.id)}
+              onClick={() => selectScale(s.id)}
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                 scaleId === s.id
                   ? "bg-amber-500 text-slate-950"
@@ -105,11 +127,48 @@ export function ScalesPage() {
             </button>
           </div>
         </div>
+        {/* 把位選擇 */}
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-semibold text-slate-400">把位：</span>
+          <button
+            onClick={() => setPosition(null)}
+            className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
+              position === null
+                ? "bg-amber-500 text-slate-950"
+                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+            }`}
+          >
+            全部
+          </button>
+          {positions.map((p, i) => (
+            <button
+              key={p.interval}
+              onClick={() => setPosition(i)}
+              className={`w-9 rounded-lg py-1 text-xs font-semibold transition-colors ${
+                position === i
+                  ? "bg-amber-500 text-slate-950"
+                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          {activePos && fretWindow && (
+            <span className="text-xs text-slate-500">
+              第 {position! + 1} 把位：
+              {activePos.fret === 0
+                ? "開放把位（0–3 格）"
+                : `第 ${fretWindow.from}–${fretWindow.to} 格`}
+            </span>
+          )}
+        </div>
+
         <Fretboard
           rootPc={rootPc}
           intervals={scale.intervals}
           degrees={scale.degrees}
           showDegrees={showDegrees}
+          fretWindow={fretWindow}
         />
         <p className="mt-2 text-xs text-slate-500">
           <span className="text-amber-400">●</span> 根音
@@ -118,7 +177,8 @@ export function ScalesPage() {
               　<span className="text-cyan-400">●</span> 藍調音（♭5）
             </>
           )}
-          　點任一音可試聽。
+          　點任一音可試聽。把位（Box）＝把音階切成一段段好記的指型：第 1
+          把位從第六弦根音出發，其餘依琴格順序沿指板往上排；選定把位後，把位外的音會變暗。
         </p>
       </div>
 
