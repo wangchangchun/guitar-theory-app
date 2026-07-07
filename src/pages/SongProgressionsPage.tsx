@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import type { Genre, Progression } from "../data/progressions";
 import { PROGRESSIONS } from "../data/progressions";
 import { findShapeForName } from "../data/chordLookup";
-import { noteToPc, transposeChordName } from "../data/theory";
+import { noteToPc, parseRoot, transposeChordName } from "../data/theory";
 import { chordMidiNotes } from "../types/music";
 import {
   getAudioTime,
@@ -75,6 +75,30 @@ const RHYTHM_OPTIONS: { id: RhythmId; label: string }[] = [
 const arpeggioSequence = (tones: number[]) =>
   tones.length > 2 ? [...tones, ...tones.slice(1, -1).reverse()] : tones;
 
+/** 色彩模式：把進行裡的純三和弦換成色彩和弦（教材練習 3-1） */
+type ColorMode = "plain" | "seventh" | "add9";
+
+const COLOR_OPTIONS: { id: ColorMode; label: string }[] = [
+  { id: "plain", label: "原版" },
+  { id: "seventh", label: "七和弦版" },
+  { id: "add9", label: "add9 版" },
+];
+
+function colorize(chord: string, numeral: string, mode: ColorMode): string {
+  if (mode === "plain" || chord.includes("/")) return chord;
+  const root = parseRoot(chord);
+  const suffix = chord.slice(root.length);
+  if (suffix === "") {
+    // V 級大三和弦升級成屬七，其餘大三和弦配 M7 / add9
+    if (mode === "seventh") {
+      return /^V(?!I)/.test(numeral) ? root + "7" : root + "maj7";
+    }
+    return root + "add9";
+  }
+  if (suffix === "m" && mode === "seventh") return root + "m7";
+  return chord;
+}
+
 /**
  * 歌曲進行：日系＋歐美經典和弦進行資料庫，
  * 附 12 調移調器與節奏引擎（8/16 Beat、琶音、合成鼓組 backbeat）。
@@ -85,16 +109,23 @@ export function SongProgressionsPage() {
   const [bpm, setBpm] = useState(PROGRESSIONS[0].bpm);
   const [rhythm, setRhythm] = useState<RhythmId>("eight");
   const [drumsOn, setDrumsOn] = useState(true);
+  const [colorMode, setColorMode] = useState<ColorMode>("plain");
+  const [modulate, setModulate] = useState(false);
   const [playingStep, setPlayingStep] = useState<number | null>(null);
   const timerRef = useRef<number | null>(null);
   const activeRef = useRef(false);
 
-  // 移調後的 steps（delta = 0 時保留原名，才能用到資料庫的開放和弦按法）
+  // 移調＋色彩處理後的 steps（delta = 0 時保留原名，才能用到資料庫的開放和弦按法）
   const delta = (noteToPc(keyName) - noteToPc(selected.keyRoot) + 12) % 12;
   const useFlats = useFlatsForKey(keyName);
-  const steps = selected.steps.map((s) =>
-    delta === 0 ? s : { ...s, chord: transposeChordName(s.chord, delta, useFlats) },
-  );
+  const steps = selected.steps.map((s) => ({
+    ...s,
+    chord: colorize(
+      delta === 0 ? s.chord : transposeChordName(s.chord, delta, useFlats),
+      s.numeral,
+      colorMode,
+    ),
+  }));
   const uniqueChords = [...new Set(steps.map((s) => s.chord))];
 
   const stop = () => {
@@ -110,13 +141,31 @@ export function SongProgressionsPage() {
     stop();
     activeRef.current = true;
     const beatSec = 60 / bpm;
+    const baseSteps = selected.steps;
+    const baseDelta = delta;
+    const baseKeyPc = noteToPc(keyName);
+    let shift = 0; // 転調模式：每循環一輪升半音
     let idx = 0;
     let when = getAudioTime() + 0.12;
 
     const scheduleStep = () => {
       if (!activeRef.current) return;
-      const i = idx % steps.length;
-      const step = steps[i];
+      const i = idx % baseSteps.length;
+      if (i === 0 && idx > 0 && modulate) {
+        shift++;
+        setKeyName(KEY_OPTIONS[(baseKeyPc + shift) % 12]);
+      }
+      const totalDelta = (baseDelta + shift) % 12;
+      const flats = useFlatsForKey(KEY_OPTIONS[(baseKeyPc + shift) % 12]);
+      const raw = baseSteps[i];
+      const chordName = colorize(
+        totalDelta === 0
+          ? raw.chord
+          : transposeChordName(raw.chord, totalDelta, flats),
+        raw.numeral,
+        colorMode,
+      );
+      const step = { ...raw, chord: chordName };
       const beats = step.beats ?? 4;
       const shape = findShapeForName(step.chord);
       setPlayingStep(i);
@@ -264,6 +313,20 @@ export function SongProgressionsPage() {
             >
               🥁 鼓組 {drumsOn ? "開" : "關"}
             </button>
+            <button
+              onClick={() => {
+                stop();
+                setModulate(!modulate);
+              }}
+              className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
+                modulate
+                  ? "bg-slate-700 text-amber-300"
+                  : "bg-slate-800 text-slate-500"
+              }`}
+              title="最後副歌升 Key 的経典手法：每循環一輪全體升半音"
+            >
+              転調↑ {modulate ? "開" : "關"}
+            </button>
             <label className="flex items-center gap-2 text-xs text-slate-400">
               BPM
               <input
@@ -281,6 +344,32 @@ export function SongProgressionsPage() {
             </label>
           </div>
 
+          {/* 色彩和弦切換（教材練習 3-1） */}
+          <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2">
+            <span className="text-xs font-semibold text-slate-400">色彩：</span>
+            <div className="flex gap-1.5">
+              {COLOR_OPTIONS.map((c) => (
+                <button
+                  key={c.id}
+                  onClick={() => {
+                    stop();
+                    setColorMode(c.id);
+                  }}
+                  className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
+                    colorMode === c.id
+                      ? "bg-amber-500 text-slate-950"
+                      : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  }`}
+                >
+                  {c.label}
+                </button>
+              ))}
+            </div>
+            <span className="text-xs text-slate-500">
+              把三和弦換成 M7／add9 聽顏色差：M7 都會微苦、add9 明亮現代（V 級升級成屬七）。
+            </span>
+          </div>
+
           <div className="mb-5 flex items-center gap-3">
             <button
               onClick={isPlaying ? stop : play}
@@ -293,7 +382,7 @@ export function SongProgressionsPage() {
               {isPlaying ? "⏹ 停止" : "▶ 播放"}
             </button>
             <span className="text-xs text-slate-500">
-              Backbeat：小鼓固定在 2、4 拍；16 Beat 的 hi-hat 切十六分。
+              Backbeat：小鼓固定在 2、4 拍；転調開啟時每循環一輪升半音。
             </span>
           </div>
 

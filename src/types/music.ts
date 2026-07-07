@@ -7,7 +7,12 @@ export type ChordQuality =
   | "major7"
   | "minor7"
   | "sus2"
-  | "sus4";
+  | "sus4"
+  | "add9"
+  | "6"
+  | "m6"
+  | "dim"
+  | "m7b5";
 
 export type PositionType = "open" | "barre" | "movable";
 
@@ -85,4 +90,9 @@ export const QUALITY_LABELS: Record<ChordQuality, string> = {
   minor7: "小七和弦",
   sus2: "掛留二和弦",
   sus4: "掛留四和弦",
+  add9: "加九和弦",
+  "6": "大六和弦",
+  m6: "小六和弦",
+  dim: "減三和弦",
+  m7b5: "半減七和弦",
 };

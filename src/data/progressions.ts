@@ -129,6 +129,99 @@ export const PROGRESSIONS: Progression[] = [
     examples: "華語抒情歌與 J-pop 民謠系的共同骨架。",
   },
 
+  // ── 借用和弦與精緻和聲（教材第 3–4 章）─────────────
+  {
+    id: "jpop-subdominant-minor",
+    title: "IVm 借用（催淚彈）",
+    genre: "jpop",
+    keyRoot: "C",
+    keyQuality: "major",
+    bpm: 84,
+    steps: [
+      { chord: "C", numeral: "I" },
+      { chord: "F", numeral: "IV" },
+      { chord: "Fm", numeral: "IVm" },
+      { chord: "C", numeral: "I" },
+    ],
+    description:
+      "從平行小調（C 小調）借來的下屬小和弦：F 和弦裡的 A 音降成 A♭，只動半音就讓陽光轉陰。日系抒情歌的招牌催淚機關——注意聽 IV→IVm→I 那兩步的顏色變化。",
+    soloTip: "C 大調音階；在 Fm 那一小節把 A 換成 A♭，旋律跟著和聲一起暗下來。",
+    examples: "無數日系抒情歌的橋段與結尾都靠它收淚。",
+  },
+  {
+    id: "jpop-bVI-bVII",
+    title: "♭VI–♭VII–I 熱血終止",
+    genre: "jpop",
+    keyRoot: "C",
+    keyQuality: "major",
+    bpm: 132,
+    steps: [
+      { chord: "F", numeral: "IV", beats: 2 },
+      { chord: "G", numeral: "V", beats: 2 },
+      { chord: "A♭", numeral: "♭VI", beats: 2 },
+      { chord: "B♭", numeral: "♭VII", beats: 2 },
+      { chord: "C", numeral: "I" },
+    ],
+    description:
+      "從平行小調借來 ♭VI 與 ♭VII 兩個大和弦，全音階梯一路爬回 I——動漫主題歌式的熱血收尾，音牆越疊越高。前面接 IV–V 做對照，聽「調內」與「借來的」差在哪。",
+    soloTip: "♭VI–♭VII 兩小節用 C 小調五聲最貼（它們來自平行小調），最後落回 C。",
+    examples: "熱血動漫 OP 大合唱收尾的標準配備。",
+  },
+  {
+    id: "secondary-dominant-chain",
+    title: "副屬和弦鏈（VI7–II–V–I）",
+    genre: "pop-rock",
+    keyRoot: "C",
+    keyQuality: "major",
+    bpm: 108,
+    steps: [
+      { chord: "A7", numeral: "VI7" },
+      { chord: "Dm7", numeral: "IIm7" },
+      { chord: "G7", numeral: "V7" },
+      { chord: "C", numeral: "I" },
+    ],
+    description:
+      "A7 是 Dm 的屬和弦（V/II）——古典的副屬和弦概念直接沿用：本來溫柔的 VIm 變成 VI7，多出來的 C# 音把音樂用力推向 Dm，再沿五度圈 II–V–I 回家。",
+    soloTip: "C 大調音階為底；A7 那小節把 C 升成 C#（D 和聲小調視角）最對味。",
+    examples: "爵士標準曲、城市流行、昭和歌謠的萬用回家路線。",
+  },
+  {
+    id: "jpop-sharp4-halfdim",
+    title: "♯IVm7♭5 精緻和聲",
+    genre: "jpop",
+    keyRoot: "C",
+    keyQuality: "major",
+    bpm: 88,
+    steps: [
+      { chord: "Cmaj7", numeral: "IM7" },
+      { chord: "F#m7♭5", numeral: "#IVm7♭5" },
+      { chord: "Fmaj7", numeral: "IVM7" },
+      { chord: "G7", numeral: "V7" },
+    ],
+    description:
+      "C 大調裡突然出現的 F#m7♭5：半減七和弦墊在 IV 前面，做出 F#→F 的半音低音滑落——日系精緻和聲的常客，比直接跳 IVM7 多一層轉折的優雅。",
+    soloTip: "C 大調音階；在 F#m7♭5 上強調 F# 音，讓耳朵抓住 F#→F 的半音線。",
+    examples: "J-pop 都會系、City Pop 的和聲彩蛋。",
+  },
+  {
+    id: "jpop-cliche-bassline",
+    title: "分數和弦低音下行",
+    genre: "jpop",
+    keyRoot: "C",
+    keyQuality: "major",
+    bpm: 76,
+    steps: [
+      { chord: "C", numeral: "I" },
+      { chord: "C/B", numeral: "I/7" },
+      { chord: "Am7", numeral: "VIm7" },
+      { chord: "C/G", numeral: "I/5" },
+    ],
+    description:
+      "和弦幾乎不動、低音卻 C–B–A–G 一路級進下行：分數和弦（斜線和弦）當「假 pedal point」，是流行版的固定低音變奏。斜線記法 C/B ＝ 彈 C 和弦、用 B 當最低音。",
+    soloTip: "C 大調音階；旋律保持長音，讓低音線自己說故事。",
+    examples: "鋼琴系 J-pop 前奏、抒情歌 A メロ的常客。",
+  },
+
   // ── 歐美經典進行 ──────────────────────────
   {
     id: "twelve-bar-blues-E",

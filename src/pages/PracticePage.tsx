@@ -6,9 +6,12 @@ import {
   FORMULA_LIST,
   INTERVALS,
   intervalOf,
+  noteToPc,
+  pcToName,
   spellChordTones,
   theoryChordMidis,
 } from "../data/theory";
+import { MAJOR_DEGREES } from "../data/diatonic";
 import { playMidiNotes } from "../audio/audioEngine";
 
 /**
@@ -84,7 +87,49 @@ function genIntervalQuestion(): Question {
     ...withOptions(iv.name, distractors),
     explanation:
       `${iv.semitones} 個半音是${iv.name}。速記：大二度 2、小三度 3、大三度 4、` +
-      `完全四度 5、完全五度 7、小七度 10、大七度 11 個半音。`,
+      `完全四度 5、減五度 6、完全五度 7、大六度 9、小七度 10、大七度 11、大九度 14 個半音。`,
+  };
+}
+
+/** 題型五：順階和弦級數（調性字典） */
+function genDiatonicQuestion(): Question {
+  const key = pick(ROOTS);
+  const entry = pick(MAJOR_DEGREES);
+  const rootName = pcToName(noteToPc(key) + entry.semitones);
+  const f = CHORD_FORMULAS[entry.seventhQuality];
+  const chordName = rootName + f.suffix;
+  const explanation =
+    `${key} 大調順階七和弦依序是 IM7・IIm7・IIIm7・IVM7・V7・VIm7・VIIm7♭5；` +
+    `${entry.seventhNumeral} 的根音落在 ${rootName}，所以是 ${chordName}。`;
+  const soundMidis = theoryChordMidis(rootName, f.intervals);
+
+  if (Math.random() < 0.5) {
+    const distractors = pickN(
+      MAJOR_DEGREES.filter((d) => d !== entry),
+      3,
+    ).map(
+      (d) =>
+        pcToName(noteToPc(key) + d.semitones) +
+        CHORD_FORMULAS[d.seventhQuality].suffix,
+    );
+    return {
+      prompt: `${key} 大調的 ${entry.seventhNumeral} 是哪個和弦？`,
+      ...withOptions(chordName, distractors),
+      explanation,
+      soundMidis,
+      soundLabel: chordName,
+    };
+  }
+  const distractors = pickN(
+    MAJOR_DEGREES.filter((d) => d !== entry),
+    3,
+  ).map((d) => d.seventhNumeral);
+  return {
+    prompt: `${chordName} 在 ${key} 大調中是哪一級？`,
+    ...withOptions(entry.seventhNumeral, distractors),
+    explanation,
+    soundMidis,
+    soundLabel: chordName,
   };
 }
 
@@ -169,6 +214,7 @@ function buildRound(): Question[] {
     genIntervalQuestion, genIntervalQuestion,
     genTransformQuestion, genTransformQuestion,
     genIdentifyQuestion, genIdentifyQuestion,
+    genDiatonicQuestion, genDiatonicQuestion,
   ];
   const questions: Question[] = [];
   for (const gen of shuffle(gens)) {
@@ -325,7 +371,7 @@ export function PracticePage() {
       </div>
 
       <p className="mt-4 text-center text-xs text-slate-500">
-        題目涵蓋：和弦組成音 · 音程辨認 · 和弦變化 · 聽組成音認和弦
+        題目涵蓋：和弦組成音 · 音程辨認 · 和弦變化 · 認和弦 · 順階級數
       </p>
     </div>
   );

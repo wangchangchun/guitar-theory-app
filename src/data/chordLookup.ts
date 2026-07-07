@@ -14,8 +14,8 @@ interface MovableForm {
   /** 相對於封閉把位的琴格 */
   relFrets: (number | "x")[];
   fingers: (number | null)[];
-  /** 食指橫按範圍（琴格 = 封閉把位） */
-  barre?: { fromString: number; toString: number };
+  /** 橫按範圍；rel = 橫按相對於封閉把位的偏移（預設 0） */
+  barre?: { fromString: number; toString: number; rel?: number };
 }
 
 const E_OPEN_PC = 4; // 第六弦空弦 E
@@ -53,6 +53,79 @@ const MOVABLE_FORMS: Record<ChordQuality, MovableForm[]> = {
     { rootString: 6, relFrets: [0, 2, 2, 2, 0, 0], fingers: [1, 2, 3, 4, 1, 1], barre: { fromString: 6, toString: 1 } },
     { rootString: 5, relFrets: ["x", 0, 2, 2, 3, 0], fingers: [null, 1, 2, 3, 4, 1], barre: { fromString: 5, toString: 1 } },
   ],
+  add9: [
+    { rootString: 5, relFrets: ["x", 0, 2, 4, 2, 0], fingers: [null, 1, 2, 4, 3, 1], barre: { fromString: 5, toString: 1 } },
+  ],
+  "6": [
+    { rootString: 5, relFrets: ["x", 0, 2, 2, 2, 2], fingers: [null, 1, 3, 3, 3, 3], barre: { fromString: 4, toString: 1, rel: 2 } },
+  ],
+  m6: [
+    { rootString: 5, relFrets: ["x", 0, 2, 2, 1, 2], fingers: [null, 1, 3, 4, 2, 4] },
+  ],
+  dim: [
+    { rootString: 5, relFrets: ["x", 0, 1, 2, 1, "x"], fingers: [null, 1, 2, 4, 3, null] },
+  ],
+  m7b5: [
+    { rootString: 5, relFrets: ["x", 0, 1, 0, 1, "x"], fingers: [null, 1, 3, 2, 4, null] },
+  ],
+};
+
+/**
+ * 常用斜線和弦（分數和弦）按法：上方和弦＋指定低音。
+ * findShapeForName 會優先查這張表；移調後查不到時退回主和弦按法。
+ */
+const SLASH_SHAPES: Record<string, ChordShape> = {
+  "C/B": {
+    id: "slash-C-B",
+    chordName: "C/B",
+    quality: "major",
+    positionType: "open",
+    frets: ["x", 2, 2, 0, 1, 0],
+    fingers: [null, 2, 3, null, 1, null],
+    note: "C 和弦、B 當低音：低音下行 C→B→A 的中繼站。",
+  },
+  "C/G": {
+    id: "slash-C-G",
+    chordName: "C/G",
+    quality: "major",
+    positionType: "open",
+    frets: [3, 3, 2, 0, 1, 0],
+    fingers: [3, 4, 2, null, 1, null],
+    note: "C 和弦、G 當低音（Ⅰ/5）。",
+  },
+  "C/E": {
+    id: "slash-C-E",
+    chordName: "C/E",
+    quality: "major",
+    positionType: "open",
+    frets: [0, 3, 2, 0, 1, 0],
+    fingers: [null, 3, 2, null, 1, null],
+  },
+  "G/B": {
+    id: "slash-G-B",
+    chordName: "G/B",
+    quality: "major",
+    positionType: "open",
+    frets: ["x", 2, 0, 0, 3, 3],
+    fingers: [null, 1, null, null, 3, 4],
+  },
+  "D/F#": {
+    id: "slash-D-Fsharp",
+    chordName: "D/F#",
+    quality: "major",
+    positionType: "open",
+    frets: [2, "x", 0, 2, 3, 2],
+    fingers: [1, null, null, 2, 4, 3],
+    note: "低音 F# 常用拇指扣住第六弦。",
+  },
+  "Am/G": {
+    id: "slash-Am-G",
+    chordName: "Am/G",
+    quality: "minor",
+    positionType: "open",
+    frets: [3, 0, 2, 2, 1, 0],
+    fingers: [4, null, 2, 3, 1, null],
+  },
 };
 
 /** 和弦記號 → 性質對照（例如 "m7" → minor7） */
@@ -65,12 +138,21 @@ const SUFFIX_TO_QUALITY: Record<string, ChordQuality> = {
   m7: "minor7",
   sus2: "sus2",
   sus4: "sus4",
+  add9: "add9",
+  "6": "6",
+  m6: "m6",
+  dim: "dim",
+  "m7♭5": "m7b5",
 };
 
-/** 由完整和弦名稱（例如 "Am7"、"B♭"）找出按法 */
+/** 由完整和弦名稱（例如 "Am7"、"B♭"、"C/B"）找出按法 */
 export function findShapeForName(chordName: string): ChordShape {
-  const root = parseRoot(chordName);
-  const quality = SUFFIX_TO_QUALITY[chordName.slice(root.length)];
+  const slash = SLASH_SHAPES[chordName];
+  if (slash) return slash;
+  // 斜線和弦查不到現成按法時，退回主和弦（低音交給想像力）
+  const main = chordName.split("/")[0];
+  const root = parseRoot(main);
+  const quality = SUFFIX_TO_QUALITY[main.slice(root.length)];
   if (!quality) throw new Error(`無法解析和弦名稱：${chordName}`);
   return findChordShape(root, quality);
 }
@@ -105,7 +187,11 @@ export function findChordShape(root: string, quality: ChordQuality): ChordShape 
     frets,
     fingers: form.fingers,
     barre: form.barre
-      ? { fret: base, fromString: form.barre.fromString, toString: form.barre.toString }
+      ? {
+          fret: base + (form.barre.rel ?? 0),
+          fromString: form.barre.fromString,
+          toString: form.barre.toString,
+        }
       : undefined,
   };
 }

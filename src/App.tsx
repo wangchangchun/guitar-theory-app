@@ -2,14 +2,16 @@ import { useState } from "react";
 import type { ReactElement } from "react";
 import { ChordLibraryPage } from "./pages/ChordLibraryPage";
 import { ScalesPage } from "./pages/ScalesPage";
+import { DiatonicPage } from "./pages/DiatonicPage";
 import { SongProgressionsPage } from "./pages/SongProgressionsPage";
 import { PracticePage } from "./pages/PracticePage";
 
-type PageId = "chords" | "scales" | "songs" | "practice";
+type PageId = "chords" | "scales" | "diatonic" | "songs" | "practice";
 
 const NAV_ITEMS: { id: PageId; label: string }[] = [
   { id: "chords", label: "和弦圖鑑" },
   { id: "scales", label: "音階教學" },
+  { id: "diatonic", label: "調性字典" },
   { id: "songs", label: "歌曲進行" },
   { id: "practice", label: "樂理練習" },
 ];
@@ -17,6 +19,7 @@ const NAV_ITEMS: { id: PageId; label: string }[] = [
 const PAGES: Record<PageId, () => ReactElement> = {
   chords: ChordLibraryPage,
   scales: ScalesPage,
+  diatonic: DiatonicPage,
   songs: SongProgressionsPage,
   practice: PracticePage,
 };
@@ -24,8 +27,9 @@ const PAGES: Record<PageId, () => ReactElement> = {
 const FOOTNOTES: Record<PageId, string> = {
   chords: "點擊任一和弦卡片即可聆聽音效（Karplus-Strong 弦振動合成）。",
   scales: "點指板上的音可以單獨試聽；級數代表該音與根音的音程關係。",
+  diatonic: "練習目標：看到級數 1 秒反射出和弦代號——這張表是所有分析的字典。",
   songs: "▶ 播放會照 BPM 循環刷弦，跟著亮起的小節換和弦練習。",
-  practice: "答錯沒關係——回「和弦圖鑑」看看每個和弦的音程結構，再來挑戰！",
+  practice: "答錯沒關係——回「和弦圖鑑」與「調性字典」複習，再來挑戰！",
 };
 
 export default function App() {

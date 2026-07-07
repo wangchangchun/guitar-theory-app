@@ -20,9 +20,12 @@ export const INTERVALS: IntervalDef[] = [
   { semitones: 3, name: "小三度", degree: "♭3" },
   { semitones: 4, name: "大三度", degree: "3" },
   { semitones: 5, name: "完全四度", degree: "4" },
+  { semitones: 6, name: "減五度", degree: "♭5" },
   { semitones: 7, name: "完全五度", degree: "5" },
+  { semitones: 9, name: "大六度", degree: "6" },
   { semitones: 10, name: "小七度", degree: "♭7" },
   { semitones: 11, name: "大七度", degree: "7" },
+  { semitones: 14, name: "大九度", degree: "9" },
 ];
 
 export function intervalOf(semitones: number): IntervalDef {
@@ -81,6 +84,28 @@ export const FORMULA_LIST: ChordFormula[] = [
     changeText: "把三度音往上半音換成完全四度(4)：緊繃懸浮，非常想解決回大三度。",
   },
   {
+    quality: "add9",
+    suffix: "add9",
+    intervals: [0, 4, 7, 14],
+    buildText: "大三和弦＋大九度（高八度的 2）",
+    changeText:
+      "保留 3 音、上面再疊一個 9 音：比純三和弦亮、更現代，J-pop 鋼琴伴奏的預設色（有 3 音，跟 sus2 不同）。",
+  },
+  {
+    quality: "6",
+    suffix: "6",
+    intervals: [0, 4, 7, 9],
+    buildText: "大三和弦＋大六度",
+    changeText: "疊 6 不疊 7 的復古色：City Pop、老歌、爵士味的溫暖收尾。",
+  },
+  {
+    quality: "m6",
+    suffix: "m6",
+    intervals: [0, 3, 7, 9],
+    buildText: "小三和弦＋大六度",
+    changeText: "小和弦的復古變化：憂鬱裡帶一點爵士的煙燻味。",
+  },
+  {
     quality: "dominant7",
     suffix: "7",
     intervals: [0, 4, 7, 10],
@@ -100,6 +125,21 @@ export const FORMULA_LIST: ChordFormula[] = [
     intervals: [0, 3, 7, 10],
     buildText: "小三和弦＋小七度",
     changeText: "小三和弦(1·♭3·5)再疊小七度(♭7)：比 m 更柔和放鬆，Funk / R&B 常客。",
+  },
+  {
+    quality: "dim",
+    suffix: "dim",
+    intervals: [0, 3, 6],
+    buildText: "根音＋小三度＋減五度",
+    changeText: "把小三和弦的 5 再降半音：極不穩定，常當經過和弦往隔壁滑。",
+  },
+  {
+    quality: "m7b5",
+    suffix: "m7♭5",
+    intervals: [0, 3, 6, 10],
+    buildText: "減三和弦＋小七度（半減七）",
+    changeText:
+      "大調第 VII 級的原生七和弦；J-pop 精緻和聲愛用的 ♯IVm7♭5 也是它。",
   },
 ];
 
@@ -146,12 +186,14 @@ export function theoryChordMidis(root: string, intervals: number[]): number[] {
   return intervals.map((s) => rootMidi + s);
 }
 
-/** 移調：把和弦名稱的根音移動 delta 個半音，保留後綴（Am7 +2 → Bm7） */
+/** 移調：把和弦名稱的根音移動 delta 個半音，保留後綴（Am7 +2 → Bm7）；斜線和弦的低音一併移調 */
 export function transposeChordName(
   name: string,
   delta: number,
   useFlats: boolean,
 ): string {
-  const root = parseRoot(name);
-  return pcToName(noteToPc(root) + delta, useFlats) + name.slice(root.length);
+  const [main, bass] = name.split("/");
+  const root = parseRoot(main);
+  const moved = pcToName(noteToPc(root) + delta, useFlats) + main.slice(root.length);
+  return bass ? `${moved}/${pcToName(noteToPc(bass) + delta, useFlats)}` : moved;
 }
