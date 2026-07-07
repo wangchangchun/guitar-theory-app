@@ -157,6 +157,17 @@ export function ChordLibraryPage() {
             </p>
           </div>
 
+          <div className="mb-4 space-y-2 rounded-lg bg-slate-800/60 p-3 text-xs leading-relaxed text-slate-400">
+            <p>
+              <span className="mr-1 font-semibold text-amber-300">怎麼變化</span>
+              {formula.changeText}
+            </p>
+            <p>
+              <span className="mr-1 font-semibold text-sky-300">什麼時候用</span>
+              {formula.whenToUse}
+            </p>
+          </div>
+
           {selected.note && (
             <p className="mb-4 rounded-lg bg-slate-800/60 p-3 text-sm leading-relaxed text-slate-300">
               {selected.note}

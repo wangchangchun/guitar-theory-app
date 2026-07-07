@@ -29,7 +29,8 @@ const FOOTNOTES: Record<PageId, string> = {
   scales: "點指板上的音可以單獨試聽；級數代表該音與根音的音程關係。",
   diatonic: "練習目標：看到級數 1 秒反射出和弦代號——這張表是所有分析的字典。",
   songs: "▶ 播放會照 BPM 循環刷弦，跟著亮起的小節換和弦練習。",
-  practice: "答錯沒關係——回「和弦圖鑑」與「調性字典」複習，再來挑戰！",
+  practice:
+    "一個單元練一個觀念，答對率 80% 即精通；六個單元全數精通後解鎖綜合測驗。",
 };
 
 export default function App() {

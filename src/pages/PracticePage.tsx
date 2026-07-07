@@ -1,248 +1,216 @@
 import { useState } from "react";
-import type { ChordQuality } from "../types/music";
-import { QUALITY_LABELS } from "../types/music";
-import {
-  CHORD_FORMULAS,
-  FORMULA_LIST,
-  INTERVALS,
-  intervalOf,
-  noteToPc,
-  pcToName,
-  spellChordTones,
-  theoryChordMidis,
-} from "../data/theory";
-import { MAJOR_DEGREES } from "../data/diatonic";
+import type { PracticeUnit, Question } from "../data/practice";
+import { FINAL_UNIT, MASTERY_RATIO, PRACTICE_UNITS } from "../data/practice";
 import { playMidiNotes } from "../audio/audioEngine";
 
 /**
- * 樂理練習：隨機出題測驗和弦組成音、音程、和弦變化，
- * 確保「和弦變化教室」教的觀念真的有吸收。
+ * 樂理練習：把觀念拆成單元逐一驗收，每單元記錄最佳成績，
+ * 答對率達 80% 標記為「精通」；全部單元精通後解鎖綜合測驗。
  */
 
-interface Question {
-  prompt: string;
-  options: string[];
-  answerIndex: number;
-  explanation: string;
-  soundMidis?: number[];
-  soundLabel?: string;
+const STORAGE_KEY = "guitar-theory-practice-progress-v1";
+
+interface UnitProgress {
+  best: number;
+  total: number;
+  attempts: number;
 }
 
-const ROOTS = ["C", "D", "E", "F", "G", "A", "B"] as const;
+type ProgressMap = Record<string, UnitProgress>;
 
-function shuffle<T>(arr: readonly T[]): T[] {
-  const a = [...arr];
-  for (let i = a.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+function loadProgress(): ProgressMap {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}") as ProgressMap;
+  } catch {
+    return {};
   }
-  return a;
 }
 
-function pick<T>(arr: readonly T[]): T {
-  return arr[Math.floor(Math.random() * arr.length)];
+function saveProgress(map: ProgressMap) {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
 }
 
-function pickN<T>(arr: readonly T[], n: number): T[] {
-  return shuffle(arr).slice(0, n);
+function isMastered(p?: UnitProgress): boolean {
+  return !!p && p.total > 0 && p.best / p.total >= MASTERY_RATIO;
 }
 
-function withOptions(correct: string, distractors: string[]) {
-  const options = shuffle([correct, ...distractors]);
-  return { options, answerIndex: options.indexOf(correct) };
-}
-
-/** 題型一：說出和弦的組成音 */
-function genTonesQuestion(): Question {
-  const root = pick(ROOTS);
-  const f = pick(FORMULA_LIST);
-  const name = root + f.suffix;
-  const tones = spellChordTones(root, f.intervals);
-  const distractors = pickN(
-    FORMULA_LIST.filter((x) => x.quality !== f.quality),
-    3,
-  ).map((x) => spellChordTones(root, x.intervals).join(" · "));
-  const degrees = f.intervals.map((s) => intervalOf(s).degree).join("·");
-  return {
-    prompt: `${name}（${QUALITY_LABELS[f.quality]}）的組成音是？`,
-    ...withOptions(tones.join(" · "), distractors),
-    explanation: `${name} ＝ ${f.buildText}，級數 ${degrees}，也就是 ${tones.join("·")}。`,
-    soundMidis: theoryChordMidis(root, f.intervals),
-    soundLabel: name,
-  };
-}
-
-/** 題型二：辨認音程 */
-function genIntervalQuestion(): Question {
-  const root = pick(ROOTS);
-  const candidates = INTERVALS.filter((i) => i.semitones !== 0);
-  const iv = pick(candidates);
-  const target = spellChordTones(root, [iv.semitones])[0];
-  const distractors = pickN(
-    candidates.filter((x) => x.semitones !== iv.semitones),
-    3,
-  ).map((x) => x.name);
-  return {
-    prompt: `從 ${root} 往上到 ${target}（相距 ${iv.semitones} 個半音）是什麼音程？`,
-    ...withOptions(iv.name, distractors),
-    explanation:
-      `${iv.semitones} 個半音是${iv.name}。速記：大二度 2、小三度 3、大三度 4、` +
-      `完全四度 5、減五度 6、完全五度 7、大六度 9、小七度 10、大七度 11、大九度 14 個半音。`,
-  };
-}
-
-/** 題型五：順階和弦級數（調性字典） */
-function genDiatonicQuestion(): Question {
-  const key = pick(ROOTS);
-  const entry = pick(MAJOR_DEGREES);
-  const rootName = pcToName(noteToPc(key) + entry.semitones);
-  const f = CHORD_FORMULAS[entry.seventhQuality];
-  const chordName = rootName + f.suffix;
-  const explanation =
-    `${key} 大調順階七和弦依序是 IM7・IIm7・IIIm7・IVM7・V7・VIm7・VIIm7♭5；` +
-    `${entry.seventhNumeral} 的根音落在 ${rootName}，所以是 ${chordName}。`;
-  const soundMidis = theoryChordMidis(rootName, f.intervals);
-
-  if (Math.random() < 0.5) {
-    const distractors = pickN(
-      MAJOR_DEGREES.filter((d) => d !== entry),
-      3,
-    ).map(
-      (d) =>
-        pcToName(noteToPc(key) + d.semitones) +
-        CHORD_FORMULAS[d.seventhQuality].suffix,
-    );
-    return {
-      prompt: `${key} 大調的 ${entry.seventhNumeral} 是哪個和弦？`,
-      ...withOptions(chordName, distractors),
-      explanation,
-      soundMidis,
-      soundLabel: chordName,
-    };
-  }
-  const distractors = pickN(
-    MAJOR_DEGREES.filter((d) => d !== entry),
-    3,
-  ).map((d) => d.seventhNumeral);
-  return {
-    prompt: `${chordName} 在 ${key} 大調中是哪一級？`,
-    ...withOptions(entry.seventhNumeral, distractors),
-    explanation,
-    soundMidis,
-    soundLabel: chordName,
-  };
-}
-
-/** 題型三：和弦變化（C 怎麼變成 Cm / C7 / Csus4…） */
-function genTransformQuestion(): Question {
-  const root = pick(ROOTS);
-  const maj = spellChordTones(root, CHORD_FORMULAS.major.intervals);
-  const kinds: ChordQuality[] = [
-    "minor", "sus2", "sus4", "dominant7", "major7", "minor7", "power",
-  ];
-  const kind = pick(kinds);
-  const f = CHORD_FORMULAS[kind];
-  const resultName = root + f.suffix;
-  const resultTones = spellChordTones(root, f.intervals);
-
-  let prompt: string;
-  let distractors: string[];
-  switch (kind) {
-    case "minor":
-      prompt = `${root} 和弦（${maj.join("·")}）的大三度 ${maj[1]} 降半音，會變成什麼和弦？`;
-      distractors = [`${root}sus2`, `${root}7`, `${root}5`];
-      break;
-    case "sus2":
-      prompt = `把 ${root} 和弦的三度音 ${maj[1]} 換成大二度，會變成什麼和弦？`;
-      distractors = [`${root}m`, `${root}sus4`, `${root}5`];
-      break;
-    case "sus4":
-      prompt = `把 ${root} 和弦的三度音 ${maj[1]} 往上半音換成完全四度，會變成什麼和弦？`;
-      distractors = [`${root}sus2`, `${root}m`, `${root}maj7`];
-      break;
-    case "dominant7":
-      prompt = `在 ${root} 和弦（1·3·5）上再疊一個小七度，會變成什麼和弦？`;
-      distractors = [`${root}maj7`, `${root}m7`, `${root}sus4`];
-      break;
-    case "major7":
-      prompt = `在 ${root} 和弦（1·3·5）上再疊一個大七度，會變成什麼和弦？`;
-      distractors = [`${root}7`, `${root}m7`, `${root}m`];
-      break;
-    case "minor7":
-      prompt = `在 ${root}m 和弦（1·♭3·5）上再疊一個小七度，會變成什麼和弦？`;
-      distractors = [`${root}7`, `${root}maj7`, `${root}sus2`];
-      break;
-    case "power":
-      prompt = `拿掉 ${root} 和弦的三度音、只留下 1 和 5，會變成什麼和弦？`;
-      distractors = [`${root}sus2`, `${root}m`, `${root}sus4`];
-      break;
-    default:
-      throw new Error(`未支援的變化題型：${kind}`);
-  }
-
-  return {
-    prompt,
-    ...withOptions(resultName, distractors),
-    explanation: `${resultName} ＝ ${f.buildText}（${resultTones.join("·")}）。${f.changeText}`,
-    soundMidis: theoryChordMidis(root, f.intervals),
-    soundLabel: resultName,
-  };
-}
-
-/** 題型四：由組成音反推和弦 */
-function genIdentifyQuestion(): Question {
-  const root = pick(ROOTS);
-  const f = pick(FORMULA_LIST);
-  const name = root + f.suffix;
-  const tones = spellChordTones(root, f.intervals);
-  const distractors = pickN(
-    FORMULA_LIST.filter((x) => x.quality !== f.quality),
-    3,
-  ).map((x) => root + x.suffix);
-  return {
-    prompt: `組成音 ${tones.join(" · ")} 疊出來的是什麼和弦？`,
-    ...withOptions(name, distractors),
-    explanation: `${name}（${QUALITY_LABELS[f.quality]}）＝ ${f.buildText}。`,
-    soundMidis: theoryChordMidis(root, f.intervals),
-    soundLabel: name,
-  };
-}
-
-function buildRound(): Question[] {
-  const gens = [
-    genTonesQuestion, genTonesQuestion,
-    genIntervalQuestion, genIntervalQuestion,
-    genTransformQuestion, genTransformQuestion,
-    genIdentifyQuestion, genIdentifyQuestion,
-    genDiatonicQuestion, genDiatonicQuestion,
-  ];
-  const questions: Question[] = [];
-  for (const gen of shuffle(gens)) {
-    let q = gen();
-    let guard = 0;
-    while (questions.some((x) => x.prompt === q.prompt) && guard++ < 10) {
-      q = gen();
-    }
-    questions.push(q);
-  }
-  return questions;
-}
-
-function scoreMessage(score: number, total: number): string {
+function resultMessage(unit: PracticeUnit, score: number, total: number): string {
   const ratio = score / total;
-  if (ratio === 1) return "滿分！樂理之魂已覺醒，快回指板上驗證吧 🤘";
-  if (ratio >= 0.75) return "很穩！剩下的盲點回「和弦變化教室」補一下就完美了。";
-  if (ratio >= 0.5) return "有基礎了！多注意三度音與七度音的差別。";
-  return "沒關係，回和弦圖鑑看看每個和弦的音程結構，再來挑戰！";
+  if (unit.id === "final") {
+    if (ratio === 1) return "滿分通關！樂理之魂已覺醒，快回指板上驗證吧 🤘";
+    if (ratio >= MASTERY_RATIO) return "綜合測驗過關！哪題猶豫了，就回那個單元再磨一下。";
+    return "混在一起就亂了？回到出錯的單元各練一輪，再來挑戰。";
+  }
+  if (ratio === 1) return "滿分精通！這個觀念完全內化了 🎉";
+  if (ratio >= MASTERY_RATIO) return "達到 80% 精通標準！想拚滿分可以再來一輪。";
+  if (ratio >= 0.5) return "有基礎了，但還沒到 80%——看看下面的解說，再練一輪就能精通。";
+  return "別急，先讀每題的解說搞懂原理，這個單元多練幾輪一定會通。";
 }
 
 export function PracticePage() {
-  const [questions, setQuestions] = useState<Question[]>(buildRound);
+  const [progress, setProgress] = useState<ProgressMap>(loadProgress);
+  const [unit, setUnit] = useState<PracticeUnit | null>(null);
+  const [questions, setQuestions] = useState<Question[]>([]);
   const [index, setIndex] = useState(0);
   const [chosen, setChosen] = useState<number | null>(null);
   const [score, setScore] = useState(0);
   const [done, setDone] = useState(false);
 
+  const masteredCount = PRACTICE_UNITS.filter((u) =>
+    isMastered(progress[u.id]),
+  ).length;
+  const finalUnlocked = masteredCount === PRACTICE_UNITS.length;
+
+  const startUnit = (u: PracticeUnit) => {
+    setUnit(u);
+    setQuestions(u.build());
+    setIndex(0);
+    setChosen(null);
+    setScore(0);
+    setDone(false);
+  };
+
+  const backToMenu = () => setUnit(null);
+
+  const finishRound = (finalScore: number) => {
+    if (!unit) return;
+    const prev = progress[unit.id];
+    const next: ProgressMap = {
+      ...progress,
+      [unit.id]: {
+        best: Math.max(prev?.best ?? 0, finalScore),
+        total: questions.length,
+        attempts: (prev?.attempts ?? 0) + 1,
+      },
+    };
+    setProgress(next);
+    saveProgress(next);
+    setDone(true);
+  };
+
+  // ── 單元選單 ──────────────────────────────
+  if (!unit) {
+    return (
+      <div className="mx-auto max-w-4xl">
+        <div className="mb-5 rounded-2xl border border-slate-800 bg-slate-900 p-5">
+          <p className="text-sm leading-relaxed text-slate-300">
+            練習分成 <span className="font-bold text-amber-400">6 個單元</span>
+            ，每個單元只驗收一個觀念。單輪答對率達
+            <span className="mx-1 font-bold text-emerald-400">80%</span>
+            即標記為精通 ✓；全部精通後解鎖
+            <span className="mx-1 font-bold text-amber-400">綜合測驗</span>
+            ——確保每個觀念都被確實學到，而不是靠混合題矇混過關。
+          </p>
+          <p className="mt-2 text-xs text-slate-500">
+            進度：{masteredCount} / {PRACTICE_UNITS.length} 個單元已精通
+          </p>
+          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-800">
+            <div
+              className="h-full bg-emerald-500 transition-all"
+              style={{
+                width: `${(masteredCount / PRACTICE_UNITS.length) * 100}%`,
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          {PRACTICE_UNITS.map((u, i) => {
+            const p = progress[u.id];
+            const mastered = isMastered(p);
+            return (
+              <button
+                key={u.id}
+                onClick={() => startUnit(u)}
+                className={`rounded-xl border p-4 text-left transition-colors ${
+                  mastered
+                    ? "border-emerald-600/60 bg-emerald-950/30 hover:border-emerald-500"
+                    : "border-slate-800 bg-slate-900 hover:border-slate-600"
+                }`}
+              >
+                <div className="mb-1 flex items-center justify-between gap-2">
+                  <span className="font-bold text-slate-100">
+                    {u.emoji} 單元 {i + 1}｜{u.title}
+                  </span>
+                  {mastered ? (
+                    <span className="shrink-0 rounded-full bg-emerald-600/30 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                      ✓ 已精通
+                    </span>
+                  ) : p ? (
+                    <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">
+                      練習中
+                    </span>
+                  ) : (
+                    <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-500">
+                      未挑戰
+                    </span>
+                  )}
+                </div>
+                <p className="mb-2 text-xs leading-relaxed text-slate-400">
+                  {u.tagline}
+                </p>
+                <ul className="mb-2 space-y-0.5">
+                  {u.goals.map((g) => (
+                    <li key={g} className="text-[11px] leading-relaxed text-slate-500">
+                      ・{g}
+                    </li>
+                  ))}
+                </ul>
+                {p && (
+                  <p className="text-[11px] font-mono text-slate-500">
+                    最佳成績 {p.best}/{p.total}・已挑戰 {p.attempts} 輪
+                  </p>
+                )}
+              </button>
+            );
+          })}
+
+          {/* 綜合測驗卡片 */}
+          <button
+            onClick={() => finalUnlocked && startUnit(FINAL_UNIT)}
+            disabled={!finalUnlocked}
+            className={`rounded-xl border p-4 text-left transition-colors sm:col-span-2 ${
+              finalUnlocked
+                ? "border-amber-500/70 bg-amber-500/10 hover:border-amber-400"
+                : "cursor-not-allowed border-slate-800 bg-slate-900/50"
+            }`}
+          >
+            <div className="mb-1 flex items-center justify-between gap-2">
+              <span
+                className={`font-bold ${
+                  finalUnlocked ? "text-amber-300" : "text-slate-500"
+                }`}
+              >
+                {finalUnlocked ? "🏆" : "🔒"} {FINAL_UNIT.title}
+              </span>
+              {isMastered(progress[FINAL_UNIT.id]) && (
+                <span className="shrink-0 rounded-full bg-emerald-600/30 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                  ✓ 已通關
+                </span>
+              )}
+            </div>
+            <p
+              className={`text-xs leading-relaxed ${
+                finalUnlocked ? "text-slate-300" : "text-slate-600"
+              }`}
+            >
+              {finalUnlocked
+                ? FINAL_UNIT.tagline
+                : `再精通 ${PRACTICE_UNITS.length - masteredCount} 個單元即可解鎖——每個觀念都確實學到，綜合測驗才有意義。`}
+            </p>
+            {progress[FINAL_UNIT.id] && finalUnlocked && (
+              <p className="mt-2 text-[11px] font-mono text-slate-500">
+                最佳成績 {progress[FINAL_UNIT.id].best}/
+                {progress[FINAL_UNIT.id].total}
+              </p>
+            )}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── 測驗中 ───────────────────────────────
   const q = questions[index];
   const isLast = index === questions.length - 1;
   const answered = chosen !== null;
@@ -255,54 +223,74 @@ export function PracticePage() {
 
   const next = () => {
     if (isLast) {
-      setDone(true);
+      finishRound(score);
       return;
     }
     setIndex(index + 1);
     setChosen(null);
   };
 
-  const restart = () => {
-    setQuestions(buildRound());
-    setIndex(0);
-    setChosen(null);
-    setScore(0);
-    setDone(false);
-  };
-
   if (done) {
+    const mastered = score / questions.length >= MASTERY_RATIO;
     return (
       <div className="mx-auto max-w-xl rounded-2xl border border-slate-800 bg-slate-900 p-10 text-center">
-        <p className="mb-2 text-sm text-slate-400">本輪成績</p>
-        <p className="mb-4 text-5xl font-extrabold text-amber-400">
-          {score} <span className="text-2xl text-slate-500">/ {questions.length}</span>
+        <p className="mb-2 text-sm text-slate-400">
+          {unit.emoji} {unit.title}・本輪成績
         </p>
-        <p className="mb-8 text-slate-300">{scoreMessage(score, questions.length)}</p>
-        <button
-          onClick={restart}
-          className="rounded-lg bg-amber-500 px-8 py-2.5 font-semibold text-slate-950 transition-colors hover:bg-amber-400"
-        >
-          再來一輪
-        </button>
+        <p className="mb-2 text-5xl font-extrabold text-amber-400">
+          {score}{" "}
+          <span className="text-2xl text-slate-500">/ {questions.length}</span>
+        </p>
+        {mastered && (
+          <p className="mb-2 text-sm font-semibold text-emerald-400">
+            ✓ 達到精通標準（{Math.round(MASTERY_RATIO * 100)}%）
+          </p>
+        )}
+        <p className="mb-8 text-slate-300">
+          {resultMessage(unit, score, questions.length)}
+        </p>
+        <div className="flex justify-center gap-3">
+          <button
+            onClick={() => startUnit(unit)}
+            className="rounded-lg bg-amber-500 px-6 py-2.5 font-semibold text-slate-950 transition-colors hover:bg-amber-400"
+          >
+            再練一輪
+          </button>
+          <button
+            onClick={backToMenu}
+            className="rounded-lg bg-slate-700 px-6 py-2.5 font-semibold text-slate-100 transition-colors hover:bg-slate-600"
+          >
+            回單元列表
+          </button>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="mx-auto max-w-2xl">
-      {/* 進度列 */}
+      {/* 單元標題與進度列 */}
       <div className="mb-2 flex items-baseline justify-between text-sm text-slate-400">
-        <span>
-          第 {index + 1} / {questions.length} 題
+        <button
+          onClick={backToMenu}
+          className="text-slate-400 transition-colors hover:text-amber-300"
+        >
+          ← 單元列表
+        </button>
+        <span className="font-semibold text-slate-300">
+          {unit.emoji} {unit.title}
         </span>
         <span>
-          目前得分 <span className="font-bold text-amber-400">{score}</span>
+          第 {index + 1} / {questions.length} 題・得分{" "}
+          <span className="font-bold text-amber-400">{score}</span>
         </span>
       </div>
       <div className="mb-6 h-1.5 overflow-hidden rounded-full bg-slate-800">
         <div
           className="h-full bg-amber-500 transition-all"
-          style={{ width: `${((index + (answered ? 1 : 0)) / questions.length) * 100}%` }}
+          style={{
+            width: `${((index + (answered ? 1 : 0)) / questions.length) * 100}%`,
+          }}
         />
       </div>
 
@@ -370,9 +358,7 @@ export function PracticePage() {
         )}
       </div>
 
-      <p className="mt-4 text-center text-xs text-slate-500">
-        題目涵蓋：和弦組成音 · 音程辨認 · 和弦變化 · 認和弦 · 順階級數
-      </p>
+      <p className="mt-4 text-center text-xs text-slate-500">{unit.tagline}</p>
     </div>
   );
 }
