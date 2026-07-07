@@ -9,6 +9,8 @@
 
 完整規劃見 [PLAN.md](./PLAN.md)。
 
+部署於 GitHub Pages，透過 `.github/workflows/deploy-pages.yml` 於 push 到 `main` 時自動建置部署。
+
 ## 開發
 
 ```bash
