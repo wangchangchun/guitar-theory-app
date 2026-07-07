@@ -1,6 +1,6 @@
 import type { ChordQuality, ChordShape, FretValue } from "../types/music";
 import { CHORDS } from "./chords";
-import { CHORD_FORMULAS, noteToPc } from "./theory";
+import { CHORD_FORMULAS, noteToPc, parseRoot } from "./theory";
 
 /**
  * 依「根音＋和弦性質」找出按法：
@@ -54,6 +54,26 @@ const MOVABLE_FORMS: Record<ChordQuality, MovableForm[]> = {
     { rootString: 5, relFrets: ["x", 0, 2, 2, 3, 0], fingers: [null, 1, 2, 3, 4, 1], barre: { fromString: 5, toString: 1 } },
   ],
 };
+
+/** 和弦記號 → 性質對照（例如 "m7" → minor7） */
+const SUFFIX_TO_QUALITY: Record<string, ChordQuality> = {
+  "": "major",
+  m: "minor",
+  "5": "power",
+  "7": "dominant7",
+  maj7: "major7",
+  m7: "minor7",
+  sus2: "sus2",
+  sus4: "sus4",
+};
+
+/** 由完整和弦名稱（例如 "Am7"、"B♭"）找出按法 */
+export function findShapeForName(chordName: string): ChordShape {
+  const root = parseRoot(chordName);
+  const quality = SUFFIX_TO_QUALITY[chordName.slice(root.length)];
+  if (!quality) throw new Error(`無法解析和弦名稱：${chordName}`);
+  return findChordShape(root, quality);
+}
 
 export function findChordShape(root: string, quality: ChordQuality): ChordShape {
   const name = root + CHORD_FORMULAS[quality].suffix;

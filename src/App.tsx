@@ -1,18 +1,36 @@
 import { useState } from "react";
+import type { ReactElement } from "react";
 import { ChordLibraryPage } from "./pages/ChordLibraryPage";
+import { ScalesPage } from "./pages/ScalesPage";
+import { SongProgressionsPage } from "./pages/SongProgressionsPage";
 import { PracticePage } from "./pages/PracticePage";
 
-type PageId = "chords" | "practice";
+type PageId = "chords" | "scales" | "songs" | "practice";
 
-const NAV_ITEMS: { id: string; label: string; ready: boolean }[] = [
-  { id: "chords", label: "和弦圖鑑", ready: true },
-  { id: "practice", label: "樂理練習", ready: true },
-  { id: "scales", label: "音階教學", ready: false },
-  { id: "songs", label: "歌曲進行", ready: false },
+const NAV_ITEMS: { id: PageId; label: string }[] = [
+  { id: "chords", label: "和弦圖鑑" },
+  { id: "scales", label: "音階教學" },
+  { id: "songs", label: "歌曲進行" },
+  { id: "practice", label: "樂理練習" },
 ];
+
+const PAGES: Record<PageId, () => ReactElement> = {
+  chords: ChordLibraryPage,
+  scales: ScalesPage,
+  songs: SongProgressionsPage,
+  practice: PracticePage,
+};
+
+const FOOTNOTES: Record<PageId, string> = {
+  chords: "點擊任一和弦卡片即可聆聽音效（Karplus-Strong 弦振動合成）。",
+  scales: "點指板上的音可以單獨試聽；級數代表該音與根音的音程關係。",
+  songs: "▶ 播放會照 BPM 循環刷弦，跟著亮起的小節換和弦練習。",
+  practice: "答錯沒關係——回「和弦圖鑑」看看每個和弦的音程結構，再來挑戰！",
+};
 
 export default function App() {
   const [page, setPage] = useState<PageId>("chords");
+  const Page = PAGES[page];
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100">
@@ -22,42 +40,29 @@ export default function App() {
             🎸 搖滾吉他<span className="text-amber-400">樂理教室</span>
           </h1>
           <nav className="flex flex-wrap gap-1">
-            {NAV_ITEMS.map((item) =>
-              item.ready ? (
-                <button
-                  key={item.id}
-                  onClick={() => setPage(item.id as PageId)}
-                  className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
-                    page === item.id
-                      ? "bg-amber-500 text-slate-950"
-                      : "bg-slate-800 text-amber-300 hover:bg-slate-700"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              ) : (
-                <span
-                  key={item.id}
-                  className="cursor-not-allowed rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600"
-                  title="即將推出"
-                >
-                  {item.label}
-                  <span className="ml-1 text-[10px]">soon</span>
-                </span>
-              ),
-            )}
+            {NAV_ITEMS.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => setPage(item.id)}
+                className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
+                  page === item.id
+                    ? "bg-amber-500 text-slate-950"
+                    : "bg-slate-800 text-amber-300 hover:bg-slate-700"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
           </nav>
         </div>
       </header>
 
       <main className="mx-auto max-w-6xl px-4 py-6">
-        {page === "chords" ? <ChordLibraryPage /> : <PracticePage />}
+        <Page />
       </main>
 
       <footer className="mx-auto max-w-6xl px-4 pb-8 text-center text-xs text-slate-600">
-        {page === "chords"
-          ? "點擊任一和弦卡片即可聆聽音效（Karplus-Strong 弦振動合成）。"
-          : "答錯沒關係——回「和弦圖鑑」看看每個和弦的音程結構，再來挑戰！"}
+        {FOOTNOTES[page]}
       </footer>
     </div>
   );
