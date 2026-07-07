@@ -16,15 +16,18 @@ export interface IntervalDef {
 
 export const INTERVALS: IntervalDef[] = [
   { semitones: 0, name: "根音", degree: "1" },
+  { semitones: 1, name: "小二度", degree: "♭2" },
   { semitones: 2, name: "大二度", degree: "2" },
   { semitones: 3, name: "小三度", degree: "♭3" },
   { semitones: 4, name: "大三度", degree: "3" },
   { semitones: 5, name: "完全四度", degree: "4" },
   { semitones: 6, name: "減五度", degree: "♭5" },
   { semitones: 7, name: "完全五度", degree: "5" },
+  { semitones: 8, name: "小六度", degree: "♭6" },
   { semitones: 9, name: "大六度", degree: "6" },
   { semitones: 10, name: "小七度", degree: "♭7" },
   { semitones: 11, name: "大七度", degree: "7" },
+  { semitones: 12, name: "完全八度", degree: "8" },
   { semitones: 14, name: "大九度", degree: "9" },
 ];
 

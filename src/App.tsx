@@ -30,7 +30,7 @@ const FOOTNOTES: Record<PageId, string> = {
   diatonic: "練習目標：看到級數 1 秒反射出和弦代號——這張表是所有分析的字典。",
   songs: "▶ 播放會照 BPM 循環刷弦，跟著亮起的小節換和弦練習。",
   practice:
-    "一個單元練一個觀念，答對率 80% 即精通；六個單元全數精通後解鎖綜合測驗。",
+    "一個單元練一個觀念，答對率 80% 即精通；全部單元精通後解鎖綜合測驗。",
 };
 
 export default function App() {

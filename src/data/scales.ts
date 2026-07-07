@@ -67,6 +67,16 @@ export const SCALES: ScaleDef[] = [
     positionAnchors: [0, 3, 5, 7, 10],
   },
   {
+    id: "harmonic-minor",
+    name: "和聲小調音階",
+    intervals: [0, 2, 3, 5, 7, 8, 11],
+    degrees: ["1", "2", "♭3", "4", "5", "♭6", "7"],
+    description:
+      "自然小調把 ♭7 升回 7：就為了讓小調也有 V7→Im 的強力「回家」拉力。7 和 ♭6 之間的增二度，帶著獨特的異國味。",
+    usage:
+      "小調進行彈到 V（或 V7）那一小節就切換它（把 ♭7 升半音，如 Am 調把 G 升成 G#）；也是新古典金屬速彈的招牌音階。",
+  },
+  {
     id: "dorian",
     name: "Dorian 調式",
     intervals: [0, 2, 3, 5, 7, 9, 10],

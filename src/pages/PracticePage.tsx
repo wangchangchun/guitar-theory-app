@@ -94,7 +94,10 @@ export function PracticePage() {
       <div className="mx-auto max-w-4xl">
         <div className="mb-5 rounded-2xl border border-slate-800 bg-slate-900 p-5">
           <p className="text-sm leading-relaxed text-slate-300">
-            練習分成 <span className="font-bold text-amber-400">6 個單元</span>
+            練習分成{" "}
+            <span className="font-bold text-amber-400">
+              {PRACTICE_UNITS.length} 個單元
+            </span>
             ，每個單元只驗收一個觀念。單輪答對率達
             <span className="mx-1 font-bold text-emerald-400">80%</span>
             即標記為精通 ✓；全部精通後解鎖
@@ -339,7 +342,7 @@ export function PracticePage() {
             <div className="mt-3 flex items-center justify-between gap-3">
               {q.soundMidis ? (
                 <button
-                  onClick={() => playMidiNotes(q.soundMidis!)}
+                  onClick={() => playMidiNotes(q.soundMidis!, q.soundStyle)}
                   className="rounded-lg bg-slate-700 px-4 py-1.5 text-sm font-medium text-slate-100 transition-colors hover:bg-slate-600"
                 >
                   ♪ 聽聽 {q.soundLabel}
