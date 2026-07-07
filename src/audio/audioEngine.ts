@@ -76,11 +76,15 @@ export type StrumStyle = "strum" | "arpeggio";
 
 /** 播放整個和弦：strum = 快速刷弦、arpeggio = 分解和弦 */
 export function playChord(shape: ChordShape, style: StrumStyle = "strum") {
+  playMidiNotes(chordMidiNotes(shape), style);
+}
+
+/** 直接播放一組 MIDI 音高（樂理教學、練習題試聽用，不需要和弦按法） */
+export function playMidiNotes(midis: number[], style: StrumStyle = "strum") {
   const audioCtx = getContext();
-  const notes = chordMidiNotes(shape);
   const stagger = style === "strum" ? 0.045 : 0.28;
   const start = audioCtx.currentTime + 0.02;
-  notes.forEach((midi, i) => {
+  midis.forEach((midi, i) => {
     playMidiAt(audioCtx, midi, start + i * stagger, 0.28);
   });
 }

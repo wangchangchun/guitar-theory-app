@@ -1,9 +1,11 @@
 import { useMemo, useState } from "react";
 import { CHORDS } from "../data/chords";
 import type { ChordShape } from "../types/music";
-import { QUALITY_LABELS, chordNoteNames } from "../types/music";
+import { QUALITY_LABELS } from "../types/music";
+import { CHORD_FORMULAS, intervalOf, parseRoot, spellChordTones } from "../data/theory";
 import { playChord } from "../audio/audioEngine";
 import { ChordDiagram } from "../components/fretboard/ChordDiagram";
+import { ChordFamilySection } from "../components/theory/ChordFamilySection";
 
 type FilterId =
   | "all"
@@ -53,6 +55,10 @@ export function ChordLibraryPage() {
     () => CHORDS.filter((c) => matchesFilter(c, filter)),
     [filter],
   );
+
+  const root = parseRoot(selected.chordName);
+  const formula = CHORD_FORMULAS[selected.quality];
+  const tones = spellChordTones(root, formula.intervals);
 
   const selectAndPlay = (chord: ChordShape) => {
     setSelected(chord);
@@ -104,6 +110,8 @@ export function ChordLibraryPage() {
         {visibleChords.length === 0 && (
           <p className="mt-8 text-center text-slate-400">此分類目前沒有和弦。</p>
         )}
+
+        <ChordFamilySection root={root} currentQuality={selected.quality} />
       </div>
 
       {/* 右側：選中和弦詳細資訊 */}
@@ -126,17 +134,27 @@ export function ChordLibraryPage() {
           </div>
 
           <div className="mb-4">
-            <h3 className="mb-1 text-sm font-semibold text-slate-300">組成音</h3>
+            <h3 className="mb-1 text-sm font-semibold text-slate-300">
+              組成音與音程
+            </h3>
             <div className="flex flex-wrap gap-1.5">
-              {chordNoteNames(selected).map((name) => (
+              {formula.intervals.map((s, i) => (
                 <span
-                  key={name}
-                  className="rounded-md bg-slate-800 px-2 py-0.5 text-sm font-mono text-amber-300"
+                  key={s}
+                  className="flex flex-col items-center rounded-md bg-slate-800 px-2 py-1"
                 >
-                  {name}
+                  <span className="text-[10px] leading-tight text-slate-400">
+                    {intervalOf(s).name}
+                  </span>
+                  <span className="font-mono text-sm font-semibold text-amber-300">
+                    {tones[i]}
+                  </span>
                 </span>
               ))}
             </div>
+            <p className="mt-2 text-xs leading-relaxed text-slate-500">
+              {selected.chordName} ＝ {formula.buildText}
+            </p>
           </div>
 
           {selected.note && (
