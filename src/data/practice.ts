@@ -13,6 +13,7 @@ import {
 import { MAJOR_DEGREES, MINOR_DEGREES } from "./diatonic";
 import type { ScaleDef } from "./scales";
 import { SCALES } from "./scales";
+import { CIRCLE_KEYS } from "./circleOfFifths";
 
 /**
  * 樂理練習題庫：把觀念拆成一個個「單元」，每個單元只練一件事，
@@ -641,6 +642,63 @@ function conceptQuestionFor(c: ConceptQuestion): Question {
   };
 }
 
+// ── 單元 9：五度圈 ──────────────────────────
+
+const SIGNATURE_MEMO =
+  "調號速記：C 在頂端無升降；從 C 順時針走幾格就有幾個 ♯（G 1♯、D 2♯…），" +
+  "逆時針走幾格就有幾個 ♭（F 1♭、B♭ 2♭…）。";
+
+/** 五度圈相鄰調（順時針 = V 方向、逆時針 = IV 方向） */
+function genCircleNeighborQuestion(): Question {
+  const i = Math.floor(Math.random() * CIRCLE_KEYS.length);
+  const k = CIRCLE_KEYS[i];
+  const cw = CIRCLE_KEYS[(i + 1) % 12];
+  const ccw = CIRCLE_KEYS[(i + 11) % 12];
+  const majorsExcept = (names: string[]) =>
+    pickN(
+      CIRCLE_KEYS.filter((x) => !names.includes(x.major)).map((x) => x.major),
+      3,
+    );
+  if (Math.random() < 0.5) {
+    return {
+      prompt: `五度圈上，${k.major} 大調順時針的下一格（主音往上完全五度）是哪個調？`,
+      ...withOptions(cw.major, majorsExcept([cw.major])),
+      explanation:
+        `${k.major} 往上完全五度是 ${cw.major}——它正是 ${k.major} 大調的 V 級根音；` +
+        `順時針一格＝屬（V）方向，調號多一個 ♯。`,
+      soundMidis: theoryChordMidis(cw.major, CHORD_FORMULAS.major.intervals),
+      soundLabel: cw.major,
+    };
+  }
+  return {
+    prompt: `五度圈上，${k.major} 大調逆時針的下一格（主音往上完全四度）是哪個調？`,
+    ...withOptions(ccw.major, majorsExcept([ccw.major])),
+    explanation:
+      `${k.major} 往上完全四度是 ${ccw.major}——它正是 ${k.major} 大調的 IV 級根音；` +
+      `逆時針一格＝下屬（IV）方向，調號多一個 ♭。II–V–I 這類「五度下行」進行就是沿逆時針走。`,
+    soundMidis: theoryChordMidis(ccw.major, CHORD_FORMULAS.major.intervals),
+    soundLabel: ccw.major,
+  };
+}
+
+/** 調號 ↔ 調名互推 */
+function genKeySignatureQuestion(): Question {
+  const k = pick(CIRCLE_KEYS);
+  const others = CIRCLE_KEYS.filter((x) => x.major !== k.major);
+  if (Math.random() < 0.5) {
+    return {
+      prompt: `${k.major} 大調的調號是？`,
+      ...withOptions(k.signature, pickN(others, 3).map((x) => x.signature)),
+      explanation: `${k.major} 大調的調號是 ${k.signature}。${SIGNATURE_MEMO}`,
+    };
+  }
+  return {
+    prompt: `調號「${k.signature}」的大調是哪個調？`,
+    ...withOptions(`${k.major} 大調`, pickN(others, 3).map((x) => `${x.major} 大調`)),
+    explanation: `調號 ${k.signature} 對應 ${k.major} 大調。${SIGNATURE_MEMO}`,
+  };
+}
+
 // ── 單元定義 ────────────────────────────────
 
 const genTriadTones = () => genTonesQuestion(TRIAD_QUALITIES);
@@ -755,6 +813,18 @@ export const PRACTICE_UNITS: PracticeUnit[] = [
         genRelativeKeyQuestion(),
       ]),
   },
+  {
+    id: "circle",
+    title: "五度圈",
+    emoji: "🧭",
+    tagline: "調性地圖驗收：相鄰調、調號數量與五度下行的方向感。",
+    goals: [
+      "順時針＝五度上行（V 方向）、逆時針＝四度上行（IV 方向）",
+      "12 個大調的調號（幾個 ♯／♭）雙向互推",
+    ],
+    build: () =>
+      buildRound([genCircleNeighborQuestion, genKeySignatureQuestion], 8),
+  },
 ];
 
 /** 綜合測驗：每個單元抽 2 題，全部單元精通後解鎖 */
@@ -780,5 +850,6 @@ export const FINAL_UNIT: PracticeUnit = {
         ...pickN(CONCEPT_QUESTIONS, 1).map(conceptQuestionFor),
         genRelativeKeyQuestion(),
       ],
+      ...buildRound([genCircleNeighborQuestion, genKeySignatureQuestion], 2),
     ]),
 };
