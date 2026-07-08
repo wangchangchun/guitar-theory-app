@@ -29,7 +29,10 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
         <span className="mx-1 font-mono text-amber-300">1 · 3 · 5</span>。
         只要動其中一個音、或再疊一個音，就會變出下面這些親戚——
         <span className="text-amber-300">黃色</span>
-        標記就是與大三和弦不同的地方。點和弦名或按法圖可以試聽比較。
+        標記就是與大三和弦不同的地方。每列都寫著
+        <span className="mx-1 text-amber-300">怎麼變化</span>（動了哪個音）與
+        <span className="mx-1 text-sky-300">什麼時候用</span>
+        （實戰時機）。點和弦名或按法圖可以試聽比較。
       </p>
 
       <div className="divide-y divide-slate-800 rounded-xl border border-slate-800 bg-slate-900">
@@ -89,9 +92,20 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
                 })}
               </div>
 
-              <p className="min-w-48 flex-1 text-xs leading-relaxed text-slate-400">
-                {f.changeText}
-              </p>
+              <div className="min-w-48 flex-1 space-y-1 text-xs leading-relaxed text-slate-400">
+                <p>
+                  <span className="mr-1 font-semibold text-amber-300/90">
+                    怎麼變化
+                  </span>
+                  {f.changeText}
+                </p>
+                <p>
+                  <span className="mr-1 font-semibold text-sky-300/90">
+                    什麼時候用
+                  </span>
+                  {f.whenToUse}
+                </p>
+              </div>
             </div>
           );
         })}
