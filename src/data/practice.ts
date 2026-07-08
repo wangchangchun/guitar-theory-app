@@ -1,5 +1,6 @@
 import type { ChordQuality } from "../types/music";
-import { QUALITY_LABELS } from "../types/music";
+import { QUALITY_LABELS, STANDARD_TUNING_MIDI } from "../types/music";
+import { cagedPositions } from "./caged";
 import {
   CHORD_FORMULAS,
   FORMULA_LIST,
@@ -421,7 +422,258 @@ function scaleUsageQuestionFor(sc: { id: string; scenario: string }): Question {
   };
 }
 
-// ── 單元 7：指型把位（五聲 box 與一弦三音）──────────
+// ── 單元 7：指板音名 ─────────────────────────
+
+const STRING_LABELS_ZH = [
+  "第六弦（低音 E）",
+  "第五弦（A）",
+  "第四弦（D）",
+  "第三弦（G）",
+  "第二弦（B）",
+  "第一弦（高音 E）",
+];
+const ALL_NOTE_NAMES = Array.from({ length: 12 }, (_, i) => pcToName(i));
+
+/** （弦, 格）→ 音名 */
+function genFretNoteQuestion(): Question {
+  const s = Math.floor(Math.random() * 6);
+  const fret = 1 + Math.floor(Math.random() * 12);
+  const midi = STANDARD_TUNING_MIDI[s] + fret;
+  const correct = pcToName(midi % 12);
+  const openName = pcToName(STANDARD_TUNING_MIDI[s] % 12);
+  return {
+    prompt: `${STRING_LABELS_ZH[s]}第 ${fret} 格是什麼音？`,
+    ...withOptions(
+      correct,
+      pickN(ALL_NOTE_NAMES.filter((n) => n !== correct), 3),
+    ),
+    explanation:
+      `${STRING_LABELS_ZH[s]}空弦是 ${openName}，往上 ${fret} 個半音就是 ${correct}。` +
+      `速記：第 12 格回到空弦音名；第 5 格＝下一弦的空弦音（僅第三弦例外，在第 4 格）。`,
+    soundMidis: [midi],
+    soundLabel: correct,
+  };
+}
+
+/** 音名 → 格位 */
+function genFindNoteQuestion(): Question {
+  const s = Math.floor(Math.random() * 6);
+  const targetPc = pick([0, 2, 4, 5, 7, 9, 11]); // 自然音
+  const note = pcToName(targetPc);
+  const openPc = STANDARD_TUNING_MIDI[s] % 12;
+  const fret = (targetPc - openPc + 12) % 12;
+  const openName = pcToName(openPc);
+  const distractors = pickN(
+    Array.from({ length: 12 }, (_, i) => i).filter((f) => f !== fret),
+    3,
+  ).map((f) => `第 ${f} 格`);
+  return {
+    prompt: `${note} 音在${STRING_LABELS_ZH[s]}的第幾格（0–11 格內）？`,
+    ...withOptions(`第 ${fret} 格`, distractors),
+    explanation:
+      `${STRING_LABELS_ZH[s]}空弦是 ${openName}，從 ${openName} 往上數到 ${note} 是 ${fret} 個半音，` +
+      `所以在第 ${fret} 格${fret === 0 ? "（就是空弦）" : ""}。`,
+    soundMidis: [STANDARD_TUNING_MIDI[s] + fret],
+    soundLabel: note,
+  };
+}
+
+/** 相鄰弦同音換算（B 弦差一格陷阱） */
+function genOctaveShapeQuestion(): Question {
+  const s = Math.floor(Math.random() * 5); // 0..4：與下一條弦比
+  const shift = s === 3 ? 4 : 5; // G→B 弦是大三度（4 格）
+  const fret = 6 + Math.floor(Math.random() * 6); // 6..11
+  const correct = fret - shift;
+  const stringNo = ["六", "五", "四", "三", "二", "一"];
+  const distractors = [fret - 4, fret - 5, fret - 6, fret - 3]
+    .filter((f) => f !== correct)
+    .slice(0, 3)
+    .map((f) => `第 ${f} 格`);
+  return {
+    prompt: `第${stringNo[s]}弦第 ${fret} 格的音，等於第${stringNo[s + 1]}弦的第幾格？`,
+    ...withOptions(`第 ${correct} 格`, distractors),
+    explanation:
+      `相鄰兩弦相差完全四度（5 格），只有第三弦→第二弦（G→B）是大三度（4 格）。` +
+      `同一個音移到隔壁高音弦，往低把位退 ${shift} 格——B 弦的「差一格」陷阱就是這麼來的。`,
+    soundMidis: [STANDARD_TUNING_MIDI[s] + fret],
+    soundLabel: pcToName((STANDARD_TUNING_MIDI[s] + fret) % 12),
+  };
+}
+
+/** 八度型與指板規則觀念（固定題庫） */
+const OCTAVE_CONCEPT_QUESTIONS: ConceptQuestion[] = [
+  {
+    prompt: "第六弦第 3 格（G）的高八度，用「隔一弦」的八度型找，在哪裡？",
+    correct: "第四弦第 5 格",
+    distractors: ["第四弦第 3 格", "第五弦第 5 格", "第三弦第 4 格"],
+    explanation:
+      "低音側的八度型：隔一弦、往高把位 +2 格（六→四弦、五→三弦通用）。G 在第六弦第 3 格，高八度就在第四弦第 5 格——power chord 上面常疊的那個音。",
+  },
+  {
+    prompt: "第四弦上某個音的高八度在第二弦，要往高把位移幾格？",
+    correct: "3 格",
+    distractors: ["2 格", "4 格", "5 格"],
+    explanation:
+      "高音側的八度型（四→二弦、三→一弦）是 +3 格——因為中間跨過了 G→B 弦那個「少一格」的交界；低音側（六→四、五→三）則是 +2 格。",
+  },
+  {
+    prompt: "為什麼許多指板規則到了第二弦（B 弦）都要「多移 1 格」？",
+    correct: "因為 G→B 弦之間是大三度（4 格），其他相鄰弦都是完全四度（5 格）",
+    distractors: [
+      "因為 B 弦比較細、張力不同",
+      "因為 B 弦的音高超過中央 C",
+      "沒有原因，純粹是習慣",
+    ],
+    explanation:
+      "標準調弦 E–A–D–G–B–E 裡只有 G→B 是大三度。所有跨過這個交界的指型——八度型、和弦手型、音階把位——都要往高把位補 1 格。",
+  },
+  {
+    prompt: "第六弦和第一弦的音名關係是？",
+    correct: "完全相同（差兩個八度）",
+    distractors: ["差完全五度", "差完全四度", "完全無關"],
+    explanation:
+      "兩條都是 E 弦：第六弦任何一格的音名跟第一弦同一格一模一樣，只差兩個八度——背熟第六弦等於同時背好第一弦。",
+  },
+];
+
+// ── 單元 8：CAGED 與和弦內音 ──────────────────────
+
+/** CAGED 手型 ↔ 把位互推 */
+function genCagedFormQuestion(): Question {
+  const root = pick(ROOTS);
+  const positions = cagedPositions(noteToPc(root));
+  const p = pick(positions);
+  const posLabel = (x: (typeof positions)[number]) =>
+    x.offset === 0 ? "開放把位" : `第 ${x.offset} 格`;
+  const orderText = positions
+    .map(
+      (x) =>
+        `${x.form.form} 型${x.offset === 0 ? "（開放）" : `＠${x.offset} 格`}`,
+    )
+    .join(" → ");
+  const explanation =
+    `CAGED 順序固定 C→A→G→E→D 循環。${root} 和弦沿指板依序是：${orderText}。`;
+  const soundMidis = [...p.notes]
+    .sort((a, b) => a.string - b.string)
+    .map((n) => STANDARD_TUNING_MIDI[n.string] + n.fret);
+  const soundLabel = `${root}（${p.form.form} 型）`;
+
+  if (Math.random() < 0.5) {
+    return {
+      prompt: `用 ${p.form.form} 手型按 ${root} 和弦，手型要落在哪裡？`,
+      ...withOptions(
+        posLabel(p),
+        pickN(positions.filter((x) => x !== p), 3).map(posLabel),
+      ),
+      explanation,
+      soundMidis,
+      soundLabel,
+    };
+  }
+  return {
+    prompt: `${root} 和弦在${posLabel(p)}附近，該用哪個 CAGED 手型？`,
+    ...withOptions(
+      `${p.form.form} 手型`,
+      pickN(positions.filter((x) => x !== p), 3).map(
+        (x) => `${x.form.form} 手型`,
+      ),
+    ),
+    explanation,
+    soundMidis,
+    soundLabel,
+  };
+}
+
+/** Guide tones：3、7 音定義和弦身分 */
+function genGuideToneQuestion(): Question {
+  const root = pick(ROOTS);
+  const q = pick(["dominant7", "major7", "minor7", "m7b5"] as ChordQuality[]);
+  const f = CHORD_FORMULAS[q];
+  const name = root + f.suffix;
+  const tones = spellChordTones(root, f.intervals);
+  const d3 = intervalOf(f.intervals[1]).degree;
+  const d5 = intervalOf(f.intervals[2]).degree;
+  const d7 = intervalOf(f.intervals[3]).degree;
+  const correct = `${tones[1]}（${d3}）與 ${tones[3]}（${d7}）`;
+  const distractors = [
+    `${tones[0]}（1）與 ${tones[2]}（${d5}）`,
+    `${tones[0]}（1）與高八度的 ${tones[0]}`,
+    "任何調內音效果都一樣",
+  ];
+  return {
+    prompt: `在 ${name} 上 solo，長音落在哪兩個音最能「說出」這個和弦的身分？`,
+    ...withOptions(correct, distractors),
+    explanation:
+      `3 音（${tones[1]}）決定大小、7 音（${tones[3]}）決定七和弦的種類——` +
+      `這對 guide tones 一響，耳朵立刻知道現在是 ${name}；1 和 5 最安全，但每個和弦都有，說不出身分。`,
+    soundMidis: theoryChordMidis(root, f.intervals),
+    soundLabel: name,
+  };
+}
+
+/** CAGED 與和弦內音觀念（固定題庫） */
+const CAGED_CONCEPT_QUESTIONS: ConceptQuestion[] = [
+  {
+    prompt: "CAGED 系統的核心概念是？",
+    correct: "同一個和弦可用 C·A·G·E·D 五種手型沿指板各按一次",
+    distractors: [
+      "五個調各有一個專屬手型",
+      "五種不同的調弦法",
+      "和弦進行的五種排列方式",
+    ],
+    explanation:
+      "任何大三和弦都能用五個開放手型的封閉版本，沿指板由低到高各按一次——五個把位串起來，整片指板都是同一個和弦的家。",
+  },
+  {
+    prompt: "CAGED 五個手型沿指板出現的順序是？",
+    correct: "永遠是 C→A→G→E→D 循環（從哪個開始取決於和弦）",
+    distractors: [
+      "按字母順序 A→C→D→E→G",
+      "隨和弦種類改變順序",
+      "順序是隨機的，要各自背",
+    ],
+    explanation:
+      "順序固定 C→A→G→E→D、繞完再回 C：C 和弦從 C 型（開放）開始往上接 A 型、G 型…；A 和弦就從 A 型開始。記住循環，找把位不用背表。",
+  },
+  {
+    prompt: "F 和弦最常見的按法（第 1 格封閉）是哪個 CAGED 手型？",
+    correct: "E 手型",
+    distractors: ["C 手型", "A 手型", "D 手型"],
+    explanation:
+      "把開放 E 和弦整個上移 1 格、食指當琴枕封住第 1 格就是 F——E 手型封閉和弦，根音在第六弦。B 和弦（A 手型＠2 格）則是另一個常用型。",
+  },
+  {
+    prompt: "換和弦時，solo 想「跟著和聲走」最有效的做法是？",
+    correct: "換和弦的瞬間把長音落到新和弦的和弦內音（尤其 3、7 音）",
+    distractors: [
+      "繼續彈同一條音階就一定安全",
+      "每次換和弦都回到調的主音",
+      "加快速度讓錯音聽不出來",
+    ],
+    explanation:
+      "音階是地圖、和弦內音是目的地：換和弦那一拍落在對方的 3 音或 7 音（guide tones），旋律立刻「貼」上和聲——這就是 chord tone targeting。",
+  },
+  {
+    prompt: "G7 解決到 C 時，最漂亮的兩條半音線是？",
+    correct: "B→C（3→1）與 F→E（♭7→3）",
+    distractors: ["G→C 與 D→E", "G→A 與 B→D", "F→G 與 E→C"],
+    explanation:
+      "G7 的 3 音 B 往上半音進 C 的根音、♭7 音 F 往下半音進 C 的 3 音 E——這對三全音（B–F）的反向解決正是屬七和弦拉力的來源，solo 沿這兩條線走最有「解決感」。",
+  },
+  {
+    prompt: "琶音（arpeggio）練習跟音階練習的本質差別是？",
+    correct: "琶音只彈和弦內音，長音落在哪都貼和聲",
+    distractors: [
+      "琶音一定要彈得比較快",
+      "琶音只能用掃弦技巧彈",
+      "音階比琶音高級",
+    ],
+    explanation:
+      "琶音＝把和弦拆開一顆顆彈：全部都是和弦內音，怎麼停都安全；音階則包含經過音，長音落錯會「浮」起來。實戰 solo 是兩者混用——音階跑動、琶音落點。",
+  },
+];
+
+// ── 單元 9：指型把位（五聲 box 與一弦三音）──────────
 
 /** 五聲把位起點音（第 N 把位＝音階第 N 個音當第六弦起點） */
 function genBoxStartQuestion(): Question {
@@ -524,7 +776,7 @@ const FINGERING_CONCEPT_QUESTIONS: ConceptQuestion[] = [
   },
 ];
 
-// ── 單元 8：順階和弦（調性字典）───────────────────
+// ── 單元 10：順階和弦（調性字典）───────────────────
 
 function genDiatonicQuestion(): Question {
   const key = pick(ROOTS);
@@ -611,7 +863,7 @@ function genMinorDiatonicQuestion(): Question {
   };
 }
 
-// ── 單元 8：進行與功能 ──────────────────────────
+// ── 單元 11：進行與功能 ──────────────────────────
 
 /** 關係大小調互推 */
 function genRelativeKeyQuestion(): Question {
@@ -745,7 +997,7 @@ function conceptQuestionFor(c: ConceptQuestion): Question {
   };
 }
 
-// ── 單元 9：五度圈 ──────────────────────────
+// ── 單元 12：五度圈 ──────────────────────────
 
 const SIGNATURE_MEMO =
   "調號速記：C 在頂端無升降；從 C 順時針走幾格就有幾個 ♯（G 1♯、D 2♯…），" +
@@ -965,6 +1217,24 @@ export const PRACTICE_UNITS: PracticeUnit[] = [
       ]),
   },
   {
+    id: "fretnotes",
+    title: "指板音名",
+    emoji: "🔤",
+    tagline: "指板地圖的地基：每一格叫什麼名字、八度型怎麼推。",
+    goals: [
+      "任一（弦, 格）1 秒反射出音名，反向也能找格位",
+      "八度型與相鄰弦規則（B 弦差一格陷阱）",
+    ],
+    build: () =>
+      shuffle([
+        ...buildRound(
+          [genFretNoteQuestion, genFindNoteQuestion, genOctaveShapeQuestion],
+          6,
+        ),
+        ...pickN(OCTAVE_CONCEPT_QUESTIONS, 3).map(conceptQuestionFor),
+      ]),
+  },
+  {
     id: "fingering",
     title: "指型把位",
     emoji: "🎸",
@@ -978,6 +1248,22 @@ export const PRACTICE_UNITS: PracticeUnit[] = [
       shuffle([
         ...pickN(FINGERING_CONCEPT_QUESTIONS, 5).map(conceptQuestionFor),
         ...buildRound([genBoxStartQuestion], 3),
+      ]),
+  },
+  {
+    id: "caged",
+    title: "CAGED 與和弦內音",
+    emoji: "🧩",
+    tagline: "五個手型鋪滿指板，solo 長音瞄準和弦內音。",
+    goals: [
+      "CAGED：同一和弦五種手型的位置與固定順序",
+      "Guide tones：3、7 音定義和弦身分",
+      "換和弦時瞄準和弦內音（chord tone targeting）",
+    ],
+    build: () =>
+      shuffle([
+        ...buildRound([genCagedFormQuestion, genGuideToneQuestion], 5),
+        ...pickN(CAGED_CONCEPT_QUESTIONS, 3).map(conceptQuestionFor),
       ]),
   },
   {
@@ -1052,10 +1338,15 @@ export const FINAL_UNIT: PracticeUnit = {
       ...buildRound([genSeventhTones, genSeventhIdentify], 2),
       ...pickN(USAGE_SCENARIOS, 2).map(usageQuestionFor),
       ...buildRound([genScaleFormulaQuestion, genScaleTonesQuestion], 2),
+      ...buildRound(
+        [genFretNoteQuestion, genFindNoteQuestion, genOctaveShapeQuestion],
+        2,
+      ),
       ...shuffle([
         ...pickN(FINGERING_CONCEPT_QUESTIONS, 1).map(conceptQuestionFor),
         genBoxStartQuestion(),
       ]),
+      ...buildRound([genCagedFormQuestion, genGuideToneQuestion], 2),
       ...buildRound([genDiatonicQuestion, genMinorDiatonicQuestion], 2),
       ...[
         ...pickN(CONCEPT_QUESTIONS, 1).map(conceptQuestionFor),
