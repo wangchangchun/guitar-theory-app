@@ -1,38 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { PracticeUnit, Question } from "../data/practice";
 import { FINAL_UNIT, MASTERY_RATIO, PRACTICE_UNITS } from "../data/practice";
+import type { ProgressMap } from "../data/progress";
+import { isMastered, loadProgress, saveProgress } from "../data/progress";
+import { useNav } from "../nav";
 import { playMidiNotes } from "../audio/audioEngine";
 
 /**
  * 樂理練習：把觀念拆成單元逐一驗收，每單元記錄最佳成績，
  * 答對率達 80% 標記為「精通」；全部單元精通後解鎖綜合測驗。
+ * 支援從學習路線頁深連結直接開始某個單元。
  */
-
-const STORAGE_KEY = "guitar-theory-practice-progress-v1";
-
-interface UnitProgress {
-  best: number;
-  total: number;
-  attempts: number;
-}
-
-type ProgressMap = Record<string, UnitProgress>;
-
-function loadProgress(): ProgressMap {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) ?? "{}") as ProgressMap;
-  } catch {
-    return {};
-  }
-}
-
-function saveProgress(map: ProgressMap) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(map));
-}
-
-function isMastered(p?: UnitProgress): boolean {
-  return !!p && p.total > 0 && p.best / p.total >= MASTERY_RATIO;
-}
 
 function resultMessage(unit: PracticeUnit, score: number, total: number): string {
   const ratio = score / total;
@@ -69,6 +47,16 @@ export function PracticePage() {
     setScore(0);
     setDone(false);
   };
+
+  // 從學習路線頁深連結：自動開始指定單元
+  const { pendingUnitId, consumePendingUnit } = useNav();
+  useEffect(() => {
+    if (!pendingUnitId) return;
+    const target = PRACTICE_UNITS.find((u) => u.id === pendingUnitId);
+    if (target) startUnit(target);
+    consumePendingUnit();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingUnitId]);
 
   const backToMenu = () => setUnit(null);
 
