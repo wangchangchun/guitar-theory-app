@@ -159,6 +159,9 @@ export function PracticePage() {
                     </li>
                   ))}
                 </ul>
+                <p className="mb-1 text-[11px] text-amber-300/70">
+                  🎸 附 {u.drills.length} 個上琴應用練習
+                </p>
                 {p && (
                   <p className="text-[11px] font-mono text-slate-500">
                     最佳成績 {p.best}/{p.total}・已挑戰 {p.attempts} 輪
@@ -249,9 +252,30 @@ export function PracticePage() {
             ✓ 達到精通標準（{Math.round(MASTERY_RATIO * 100)}%）
           </p>
         )}
-        <p className="mb-8 text-slate-300">
+        <p className="mb-6 text-slate-300">
           {resultMessage(unit, score, questions.length)}
         </p>
+
+        {unit.drills.length > 0 && (
+          <div className="mb-8 rounded-xl bg-slate-800/60 p-4 text-left">
+            <p className="mb-3 text-sm font-bold text-amber-300">
+              🎸 上琴應用：把這個觀念搬到指板上
+            </p>
+            <ol className="space-y-3">
+              {unit.drills.map((d, i) => (
+                <li key={d.title} className="text-sm">
+                  <span className="font-semibold text-slate-100">
+                    {i + 1}. {d.title}
+                  </span>
+                  <p className="mt-0.5 text-xs leading-relaxed text-slate-400">
+                    {d.how}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
+
         <div className="flex justify-center gap-3">
           <button
             onClick={() => startUnit(unit)}
@@ -360,6 +384,26 @@ export function PracticePage() {
           </div>
         )}
       </div>
+
+      {unit.drills.length > 0 && (
+        <details className="mt-4 rounded-xl border border-slate-800 bg-slate-900 px-4 py-3">
+          <summary className="cursor-pointer text-sm font-semibold text-amber-300">
+            🎸 上琴應用練習（{unit.drills.length} 個）——答完題拿起吉他做
+          </summary>
+          <ol className="mt-3 space-y-3">
+            {unit.drills.map((d, i) => (
+              <li key={d.title} className="text-sm">
+                <span className="font-semibold text-slate-100">
+                  {i + 1}. {d.title}
+                </span>
+                <p className="mt-0.5 text-xs leading-relaxed text-slate-400">
+                  {d.how}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </details>
+      )}
 
       <p className="mt-4 text-center text-xs text-slate-500">{unit.tagline}</p>
     </div>
