@@ -681,6 +681,86 @@ function genCircleNeighborQuestion(): Question {
   };
 }
 
+/** 使用情境：挑轉調目標（平滑的近親調 vs 戲劇化的正對面） */
+function genCircleModulationQuestion(): Question {
+  const i = Math.floor(Math.random() * CIRCLE_KEYS.length);
+  const k = CIRCLE_KEYS[i];
+  const cw = CIRCLE_KEYS[(i + 1) % 12].major;
+  const ccw = CIRCLE_KEYS[(i + 11) % 12].major;
+  const opposite = CIRCLE_KEYS[(i + 6) % 12].major;
+  if (Math.random() < 0.5) {
+    const correct = pick([cw, ccw]);
+    const farKeys = pickN(
+      [4, 5, 6, 7, 8].map((o) => CIRCLE_KEYS[(i + o) % 12].major),
+      3,
+    );
+    return {
+      prompt: `情境：你用 ${k.major} 大調寫歌，副歌想平滑轉調到「只差一個音」的近親調——五度圈上該挑哪個大調？`,
+      ...withOptions(correct, farKeys),
+      explanation:
+        `${k.major} 在五度圈的相鄰兩格是 ${ccw}（IV 方向）與 ${cw}（V 方向），調內音只差一個、` +
+        `轉過去最平滑；走得越遠差的音越多，正對面的 ${opposite} 反差最大。`,
+    };
+  }
+  return {
+    prompt: `情境：${k.major} 大調的橋段想來一次最遠、反差最大的戲劇化轉調——五度圈上挑哪個調？`,
+    ...withOptions(opposite, [cw, ccw, CIRCLE_KEYS[(i + 2) % 12].major]),
+    explanation:
+      `正對面（相隔 6 格）的 ${opposite} 和 ${k.major} 共用的調內音最少，聽感反差最大；` +
+      `相鄰的 ${ccw}、${cw} 則是只差一個音的平滑近親調。`,
+  };
+}
+
+/** 使用情境：用五度圈找 I–IV–V */
+function genCircleFourFiveQuestion(): Question {
+  const i = Math.floor(Math.random() * CIRCLE_KEYS.length);
+  const k = CIRCLE_KEYS[i];
+  const cw = CIRCLE_KEYS[(i + 1) % 12].major;
+  const ccw = CIRCLE_KEYS[(i + 11) % 12].major;
+  const correct = `IV＝${ccw}、V＝${cw}`;
+  const distractors = [
+    `IV＝${cw}、V＝${ccw}`,
+    `IV＝${CIRCLE_KEYS[(i + 10) % 12].major}、V＝${CIRCLE_KEYS[(i + 2) % 12].major}`,
+    `IV＝${ccw}、V＝${CIRCLE_KEYS[(i + 2) % 12].major}`,
+  ];
+  return {
+    prompt: `情境：${k.major} 大調的歌要刷 I–IV–V 三和弦，用五度圈找 IV 和 V 的根音——答案是？`,
+    ...withOptions(correct, distractors),
+    explanation:
+      `I·IV·V 在五度圈上永遠相鄰三格：逆時針隔壁是 IV（${ccw}）、順時針隔壁是 V（${cw}）。` +
+      `所以 ${k.major} 大調的三大和弦就是 ${k.major}、${ccw}、${cw}——不用數音、看圈就好。`,
+  };
+}
+
+/** 五度圈使用情境（固定題庫） */
+const CIRCLE_CONCEPT_QUESTIONS: ConceptQuestion[] = [
+  {
+    prompt: "情境：進行 A7→D7→G7→C 一個推一個回家，這在五度圈上是什麼方向？",
+    correct: "逆時針（五度下行）",
+    distractors: ["順時針（五度上行）", "跳到正對面", "沿內圈走一圈"],
+    explanation:
+      "每個和弦都是下一個的屬和弦（V→I 連鎖），根音一路往上四度＝五度圈逆時針。副屬和弦鏈、II–V–I 都沿這個方向走，所以逆時針又叫「回家的方向」。",
+  },
+  {
+    prompt: "情境：拿到一份譜，調號有 4 個 ♯，用五度圈怎麼判斷調性？",
+    correct: "從 C 順時針數 4 格 → E 大調（或關係小調 C#m）",
+    distractors: [
+      "從 C 逆時針數 4 格 → A♭ 大調",
+      "從 C 順時針數 4 格的內圈 → Fm",
+      "調號跟五度圈無關，只能背",
+    ],
+    explanation:
+      "順時針一格多一個 ♯：G(1♯)→D(2♯)→A(3♯)→E(4♯)。同格內圈的 C#m 是關係小調、調號相同——看旋律最後停在哪個主音，就知道是 E 大調還是 C#m 小調。",
+  },
+  {
+    prompt: "情境：Am 小調的歌想借大調五聲的把位來 solo，該用哪個調的音？",
+    correct: "C 大調（Am 的關係大調）",
+    distractors: ["A 大調", "E 大調", "F 大調"],
+    explanation:
+      "五度圈同一格的內外圈共用同一組音：Am 的關係大調就是外圈的 C。A 小調五聲和 C 大調五聲是同一組音，指型直接共用，只是根音的落點不同。",
+  },
+];
+
 /** 調號 ↔ 調名互推 */
 function genKeySignatureQuestion(): Question {
   const k = pick(CIRCLE_KEYS);
@@ -817,13 +897,21 @@ export const PRACTICE_UNITS: PracticeUnit[] = [
     id: "circle",
     title: "五度圈",
     emoji: "🧭",
-    tagline: "調性地圖驗收：相鄰調、調號數量與五度下行的方向感。",
+    tagline: "調性地圖驗收：相鄰調、調號，以及實戰上什麼時候攤開這張圖。",
     goals: [
       "順時針＝五度上行（V 方向）、逆時針＝四度上行（IV 方向）",
       "12 個大調的調號（幾個 ♯／♭）雙向互推",
+      "實戰情境：找 I–IV–V、挑轉調目標、認五度下行、看調號辨調",
     ],
     build: () =>
-      buildRound([genCircleNeighborQuestion, genKeySignatureQuestion], 8),
+      shuffle([
+        ...buildRound([genCircleNeighborQuestion, genKeySignatureQuestion], 4),
+        ...buildRound(
+          [genCircleModulationQuestion, genCircleFourFiveQuestion],
+          2,
+        ),
+        ...pickN(CIRCLE_CONCEPT_QUESTIONS, 3).map(conceptQuestionFor),
+      ]),
   },
 ];
 
@@ -850,6 +938,14 @@ export const FINAL_UNIT: PracticeUnit = {
         ...pickN(CONCEPT_QUESTIONS, 1).map(conceptQuestionFor),
         genRelativeKeyQuestion(),
       ],
-      ...buildRound([genCircleNeighborQuestion, genKeySignatureQuestion], 2),
+      ...buildRound(
+        [
+          genCircleNeighborQuestion,
+          genKeySignatureQuestion,
+          genCircleModulationQuestion,
+          genCircleFourFiveQuestion,
+        ],
+        2,
+      ),
     ]),
 };
