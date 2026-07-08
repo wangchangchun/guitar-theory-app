@@ -8,6 +8,7 @@ import {
   theoryChordMidis,
 } from "../data/theory";
 import { playMidiNotes } from "../audio/audioEngine";
+import { PageIntro } from "../components/PageIntro";
 
 const MAJOR_SCALE = [0, 2, 4, 5, 7, 9, 11];
 const useFlatsForKey = (key: string) => key.includes("♭") || key === "F";
@@ -57,23 +58,21 @@ export function CircleOfFifthsPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* 教學說明 */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-        <p className="mb-2 text-sm leading-relaxed text-slate-300">
-          五度圈是 12 個調的<span className="text-amber-300">地圖</span>：
-          <span className="mx-1 font-semibold text-amber-300">順時針</span>
-          每走一格，主音往上完全五度、調號多一個 ♯；
-          <span className="mx-1 font-semibold text-sky-300">逆時針</span>
-          每走一格，主音往上完全四度、調號多一個 ♭。內圈是共用同一組音的關係小調。
-        </p>
-        <ul className="grid gap-x-6 gap-y-1 text-xs leading-relaxed text-slate-400 sm:grid-cols-2">
-          <li>・查調號：從頂端的 C 順時針數幾格就有幾個 ♯，逆時針數幾格就有幾個 ♭</li>
-          <li>・找和弦：任何調的 V 在順時針隔壁、IV 在逆時針隔壁——I·IV·V 永遠相鄰三格</li>
-          <li>・找關係小調：同一格的內圈就是它（同一組音，solo 音階通用）</li>
-          <li>・轉調：相鄰的調只差一個音、轉起來最平滑；正對面的調最遠、最戲劇化</li>
-          <li>・進行方向：II–V–I、副屬和弦鏈都是沿逆時針（五度下行）一路走回家</li>
-        </ul>
-      </div>
+      <PageIntro
+        storageKey="circle"
+        phase="階段 4 · 調性與和聲功能"
+        what="五度圈是 12 個調的地圖：順時針每走一格，主音往上完全五度、調號多一個 ♯；逆時針每走一格往上完全四度、多一個 ♭。內圈是共用同一組音的關係小調。"
+        steps={[
+          "點圓盤上任一個調（外圈大調／內圈小調）試聽並選定它",
+          "右側會顯示這個調的調號、調內音與七個順階和弦，可逐一試聽",
+          "用「近親調」按鈕跳到相鄰的調，聽轉調前後差多少",
+        ]}
+        notes={[
+          "找 I·IV·V：任何調的 V 在順時針隔壁、IV 在逆時針隔壁，永遠相鄰三格",
+          "II–V–I、副屬和弦鏈都是沿逆時針（五度下行）一路走回家",
+          "相鄰的調只差一個音、轉起來最平滑；正對面的調最遠、最戲劇化",
+        ]}
+      />
 
       <div className="flex flex-col gap-6 lg:flex-row">
         {/* 圓盤 */}

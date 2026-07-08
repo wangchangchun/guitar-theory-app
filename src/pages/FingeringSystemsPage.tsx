@@ -3,6 +3,7 @@ import { SCALES } from "../data/scales";
 import { buildPattern } from "../data/patterns";
 import { noteToPc, spellChordTones } from "../data/theory";
 import { Fretboard } from "../components/fretboard/Fretboard";
+import { PageIntro } from "../components/PageIntro";
 import { getAudioTime, noteAt } from "../audio/audioEngine";
 
 const ROOT_OPTIONS = [
@@ -71,24 +72,21 @@ export function FingeringSystemsPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* 教學說明 */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-        <p className="mb-2 text-sm leading-relaxed text-slate-300">
-          同一個音在指板上會出現很多次，直接背整片指板太難——所以吉他手把音階切成
-          <span className="mx-1 text-amber-300">「每弦固定幾個音」的形狀（把位／指型）</span>
-          來記。兩大系統：
-          <span className="mx-1 font-semibold text-amber-300">五聲把位</span>
-          每弦 2 音、共 5 個把位；
-          <span className="mx-1 font-semibold text-sky-300">一弦三音（3NPS）</span>
-          每弦 3 音、共 7 個把位。
-        </p>
-        <ul className="grid gap-x-6 gap-y-1 text-xs leading-relaxed text-slate-400 sm:grid-cols-2">
-          <li>・共同規則：第 N 把位就從第六弦的「音階第 N 個音」出發</li>
-          <li>・相鄰把位共用一半的音——沿一條弦滑一格就無縫換把位</li>
-          <li>・五聲 box 好背好彈，是即興的地基；第 1 把位與 E 手型封閉和弦重疊</li>
-          <li>・3NPS 每弦音數固定 → 撥序與捶勾規律，速彈／legato 的標配</li>
-        </ul>
-      </div>
+      <PageIntro
+        storageKey="fingering"
+        phase="階段 2 · 指板導航"
+        what="同一個音在指板上會出現很多次，直接背整片太難——所以把音階切成「每弦固定幾個音」的形狀來記。兩大系統：五聲把位（每弦 2 音 × 5 把位）與一弦三音 3NPS（每弦 3 音 × 7 把位）。"
+        steps={[
+          "選一個根音（新手用預設 A），先看上半的五聲把位",
+          "用「把位」按鈕逐一檢視，按「▶ 播放把位」聽這段指型",
+          "五聲熟了，再往下看一弦三音——同一組音、換一種切法，速彈用",
+        ]}
+        notes={[
+          "共同規則：第 N 把位就從第六弦的「音階第 N 個音」出發",
+          "相鄰把位共用一半的音——沿一條弦滑一格就無縫換把位",
+          "五聲第 1 把位與 E 手型封閉和弦重疊；3NPS 撥序規律，適合 legato",
+        ]}
+      />
 
       {/* 根音選擇 */}
       <div>

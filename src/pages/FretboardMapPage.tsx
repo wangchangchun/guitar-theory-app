@@ -10,6 +10,7 @@ import {
   theoryChordMidis,
 } from "../data/theory";
 import { Fretboard } from "../components/fretboard/Fretboard";
+import { PageIntro } from "../components/PageIntro";
 import { getAudioTime, noteAt, playMidiNotes } from "../audio/audioEngine";
 
 const ROOT_OPTIONS = [
@@ -62,18 +63,20 @@ export function FretboardMapPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      {/* 總說明 */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-        <p className="text-sm leading-relaxed text-slate-300">
-          這一頁把指板變成一張地圖，分三步：
-          <span className="mx-1 text-amber-300">① 指板音名</span>
-          ——每一格叫什麼名字、用八度型快速推；
-          <span className="mx-1 text-amber-300">② CAGED 五型</span>
-          ——同一個和弦用五種手型鋪滿指板；
-          <span className="mx-1 text-sky-300">③ 琶音與和弦內音</span>
-          ——solo 的長音瞄準和弦內音（尤其 3、7 音），旋律就會「貼」著和聲走。
-        </p>
-      </div>
+      <PageIntro
+        storageKey="fretmap"
+        phase="階段 2–3 · 指板導航與橋接"
+        what="這一頁把指板變成一張地圖，由淺入深分三段，跟著往下捲即可。"
+        steps={[
+          "① 指板音名：先認每一格叫什麼名字、用八度型快速推算",
+          "② CAGED 五型：選一個根音，看同一個和弦用五種手型鋪滿指板",
+          "③ 琶音與和弦內音：切換和弦種類，看 solo 該瞄準的 3、7 音落在哪",
+        ]}
+        notes={[
+          "前兩段（音名、CAGED）屬階段 2，第三段（和弦內音瞄準）屬階段 3",
+          "solo 長音落在和弦內音上，旋律就會「貼」著和聲走",
+        ]}
+      />
 
       {/* ① 指板音名與八度型 */}
       <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
