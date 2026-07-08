@@ -421,7 +421,110 @@ function scaleUsageQuestionFor(sc: { id: string; scenario: string }): Question {
   };
 }
 
-// ── 單元 7：順階和弦（調性字典）───────────────────
+// ── 單元 7：指型把位（五聲 box 與一弦三音）──────────
+
+/** 五聲把位起點音（第 N 把位＝音階第 N 個音當第六弦起點） */
+function genBoxStartQuestion(): Question {
+  const root = pick(ROOTS);
+  const s = SCALES.find((x) => x.id === "minor-pentatonic")!;
+  const k = 1 + Math.floor(Math.random() * 4); // 第 2～5 把位
+  const tones = s.intervals.map((iv) => spellChordTones(root, [iv])[0]);
+  const correct = tones[k];
+  const distractors = pickN(tones.filter((t) => t !== correct), 3);
+  return {
+    prompt: `${root} 小調五聲的第 ${k + 1} 把位，第六弦的起點是哪個音？`,
+    ...withOptions(correct, distractors),
+    explanation:
+      `把位規則：第 N 把位就從音階的第 N 個音出發。` +
+      `${root} 小調五聲＝${tones.join("·")}，第 ${k + 1} 個音是 ${correct}，` +
+      `所以第 ${k + 1} 把位的第六弦起點就是它。`,
+    soundMidis: theoryChordMidis(root, [...s.intervals, 12]),
+    soundLabel: `${root} 小調五聲`,
+    soundStyle: "arpeggio",
+  };
+}
+
+/** 指型系統觀念（固定題庫） */
+const FINGERING_CONCEPT_QUESTIONS: ConceptQuestion[] = [
+  {
+    prompt: "五聲音階在指板上共有幾個把位（box）？",
+    correct: "5 個——每個音階音各當一次第六弦起點",
+    distractors: ["3 個", "7 個——每個音級一個", "12 個——每格一個"],
+    explanation:
+      "五聲音階有 5 個音，每個音都可以當把位的第六弦起點，所以正好 5 個把位；沿指板一個接一個排，拼起來就是整片指板。",
+  },
+  {
+    prompt: "「一弦三音（3NPS）」指的是什麼？",
+    correct: "七聲音階每條弦固定彈 3 個音的指型系統",
+    distractors: [
+      "每三格換一次把位的移動方式",
+      "只用三條弦彈音階",
+      "和弦每弦只按三個音",
+    ],
+    explanation:
+      "3NPS（Three Notes Per String）把大調／小調等七聲音階整理成每弦固定 3 個音、共 7 個把位的系統——音多、把位寬、換弦點固定。",
+  },
+  {
+    prompt: "速彈和 legato 樂手偏愛一弦三音指型，主要原因是？",
+    correct: "每弦音數固定，撥序與捶勾模式完全規律",
+    distractors: [
+      "音比較多聽起來比較厲害",
+      "完全不需要移動把位",
+      "只能用下撥所以比較簡單",
+    ],
+    explanation:
+      "每弦都是 3 個音：交替撥弦的落點、捶勾（hammer-on／pull-off）的組合在每條弦上一模一樣，肌肉記憶可以無限複製——這就是速彈機器的祕密。",
+  },
+  {
+    prompt: "五聲音階把位（box）裡，每條弦要按幾個音？",
+    correct: "2 個",
+    distractors: ["1 個", "3 個", "每條弦數量不同"],
+    explanation:
+      "五聲 box 每弦正好 2 音，手型緊湊、推弦揉弦空間大——這是它好背好彈的原因；相對地 3NPS 每弦 3 音。",
+  },
+  {
+    prompt: "一弦三音系統共有幾個把位？",
+    correct: "7 個——每個音級各起一個",
+    distractors: ["5 個", "3 個", "6 個——每條弦一個"],
+    explanation:
+      "七聲音階有 7 個音，每個音都能當第六弦的把位起點，所以 3NPS 共 7 個把位。",
+  },
+  {
+    prompt: "A 小調五聲第 1 把位（第 5 格起）跟哪個封閉和弦手型重疊？",
+    correct: "E 手型的 Am 封閉和弦（根音在第六弦第 5 格）",
+    distractors: [
+      "A 手型的 Dm 封閉和弦",
+      "C 手型的開放 C 和弦",
+      "G 手型的開放 G 和弦",
+    ],
+    explanation:
+      "第六弦第 5 格是 A：E 手型封閉和弦跟五聲第 1 把位共用根音與大部分位置——和弦按著不動就能找到 solo 音，這是「和弦與把位互相定位」（CAGED 思維）的第一步。",
+  },
+  {
+    prompt: "為什麼五聲音階被稱為「怎麼彈都不太出錯」？",
+    correct: "它拿掉了最容易和和弦打架的音（如大調的 4 和 7）",
+    distractors: [
+      "因為它音少所以只能彈得慢",
+      "因為它只有根音和五度",
+      "因為它每條弦的指型都一樣",
+    ],
+    explanation:
+      "大調五聲＝大調去掉 4、7；小調五聲＝自然小調去掉 2、♭6——去掉的正是最容易與和弦撞出半音衝突的音，剩下的音對調內和弦幾乎都是安全音。",
+  },
+  {
+    prompt: "把位跟把位之間要怎麼「接起來」貫通整個指板？",
+    correct: "相鄰把位共用一半的音，沿同一條弦滑到共用音就換過去",
+    distractors: [
+      "彈完一個把位要停下來重新定位",
+      "把位之間沒有關係，要分開背",
+      "只能從第 1 把位照順序彈到第 5",
+    ],
+    explanation:
+      "相鄰把位是同一組音的不同切法：第 N 把位高把位側的音＝第 N+1 把位低把位側的音。在任一條弦上滑一格到共用音，就無縫接到下一個把位。",
+  },
+];
+
+// ── 單元 8：順階和弦（調性字典）───────────────────
 
 function genDiatonicQuestion(): Question {
   const key = pick(ROOTS);
@@ -862,6 +965,22 @@ export const PRACTICE_UNITS: PracticeUnit[] = [
       ]),
   },
   {
+    id: "fingering",
+    title: "指型把位",
+    emoji: "🎸",
+    tagline: "五聲 box 與一弦三音：把音階變成手指背得起來的形狀。",
+    goals: [
+      "五聲 5 把位：每弦 2 音、第 N 把位從第 N 個音出發",
+      "一弦三音 7 把位：每弦 3 音，速彈與 legato 的標配",
+      "把位怎麼互相連接、怎麼跟封閉和弦手型對位",
+    ],
+    build: () =>
+      shuffle([
+        ...pickN(FINGERING_CONCEPT_QUESTIONS, 5).map(conceptQuestionFor),
+        ...buildRound([genBoxStartQuestion], 3),
+      ]),
+  },
+  {
     id: "diatonic",
     title: "順階和弦",
     emoji: "📖",
@@ -933,6 +1052,10 @@ export const FINAL_UNIT: PracticeUnit = {
       ...buildRound([genSeventhTones, genSeventhIdentify], 2),
       ...pickN(USAGE_SCENARIOS, 2).map(usageQuestionFor),
       ...buildRound([genScaleFormulaQuestion, genScaleTonesQuestion], 2),
+      ...shuffle([
+        ...pickN(FINGERING_CONCEPT_QUESTIONS, 1).map(conceptQuestionFor),
+        genBoxStartQuestion(),
+      ]),
       ...buildRound([genDiatonicQuestion, genMinorDiatonicQuestion], 2),
       ...[
         ...pickN(CONCEPT_QUESTIONS, 1).map(conceptQuestionFor),
