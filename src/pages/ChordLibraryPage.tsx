@@ -6,6 +6,7 @@ import { CHORD_FORMULAS, intervalOf, parseRoot, spellChordTones } from "../data/
 import { playChord } from "../audio/audioEngine";
 import { ChordDiagram } from "../components/fretboard/ChordDiagram";
 import { ChordFamilySection } from "../components/theory/ChordFamilySection";
+import { PageIntro } from "../components/PageIntro";
 
 type FilterId =
   | "all"
@@ -66,9 +67,25 @@ export function ChordLibraryPage() {
   };
 
   return (
-    <div className="flex flex-col gap-6 lg:flex-row">
-      {/* 左側：篩選 + 和弦卡片格 */}
-      <div className="flex-1">
+    <div className="flex flex-col gap-6">
+      <PageIntro
+        storageKey="chords"
+        phase="階段 1 · 和弦地基"
+        what="所有和弦的字典：每個和弦的按法、組成音，以及怎麼從基本和弦變化出各種親戚。"
+        steps={[
+          "點左邊任一張和弦卡片 → 右側會顯示它的組成音、音程，並可按「刷弦／分解」試聽",
+          "讀右側的「怎麼變化」與「什麼時候用」，知道這個和弦的來歷和實戰用途",
+          "往下捲到「和弦變化教室」，聽同一個根音如何長出一整個家族",
+        ]}
+        notes={[
+          "上方篩選鈕可只看某一類（大三、小三、七和弦、掛留、封閉…）",
+          "新手先熟 E、A、D、G、C 五個開放和弦，其他都是它們的變化",
+        ]}
+      />
+
+      <div className="flex flex-col gap-6 lg:flex-row">
+        {/* 左側：篩選 + 和弦卡片格 */}
+        <div className="flex-1">
         <div className="mb-4 flex flex-wrap gap-2">
           {FILTERS.map((f) => (
             <button
@@ -193,7 +210,8 @@ export function ChordLibraryPage() {
             手指編號：1 食指 · 2 中指 · 3 無名指 · 4 小指
           </p>
         </div>
-      </aside>
+        </aside>
+      </div>
     </div>
   );
 }

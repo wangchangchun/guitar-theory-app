@@ -14,6 +14,7 @@ import {
   strumChordAt,
 } from "../audio/audioEngine";
 import { ChordDiagram } from "../components/fretboard/ChordDiagram";
+import { PageIntro } from "../components/PageIntro";
 
 const GENRE_LABELS: Record<Genre, string> = {
   jpop: "日系流行",
@@ -212,9 +213,25 @@ export function SongProgressionsPage() {
   const isPlaying = playingStep !== null;
 
   return (
-    <div className="flex flex-col gap-6 lg:flex-row">
-      {/* 左側：進行清單 */}
-      <div className="flex w-full shrink-0 flex-col gap-2 lg:w-72">
+    <div className="flex flex-col gap-6">
+      <PageIntro
+        storageKey="songs"
+        phase="階段 5 · 實戰應用"
+        what="把前面學的全部倒進真的和弦進行裡：移調、換節奏、換色彩和弦，還有配對的 solo 音階。"
+        steps={[
+          "左側選一個進行——新手從最上面的「王道進行」開始",
+          "按「▶ 播放」聽伴奏循環，跟著亮起的小節看和弦怎麼換",
+          "試試「Key」移調、切換節奏型與「色彩」，聽同一進行的不同面貌",
+        ]}
+        notes={[
+          "每個和弦上方的級數（IVM7、V7…）就是「調性字典」教的順階和弦",
+          "最下方有 Solo 建議：該配哪條音階、長音落哪裡",
+        ]}
+      />
+
+      <div className="flex flex-col gap-6 lg:flex-row">
+        {/* 左側：進行清單 */}
+        <div className="flex w-full shrink-0 flex-col gap-2 lg:w-72">
         {PROGRESSIONS.map((p) => (
           <button
             key={p.id}
@@ -453,6 +470,7 @@ export function SongProgressionsPage() {
             )}
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

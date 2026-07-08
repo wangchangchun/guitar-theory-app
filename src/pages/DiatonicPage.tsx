@@ -4,6 +4,7 @@ import { CHORD_FORMULAS, noteToPc, pcToName, spellChordTones } from "../data/the
 import { findChordShape } from "../data/chordLookup";
 import { playChord } from "../audio/audioEngine";
 import { ChordDiagram } from "../components/fretboard/ChordDiagram";
+import { PageIntro } from "../components/PageIntro";
 
 const KEY_OPTIONS = [
   "C", "D♭", "D", "E♭", "E", "F", "F#", "G", "A♭", "A", "B♭", "B",
@@ -30,15 +31,20 @@ export function DiatonicPage() {
 
   return (
     <div className="flex flex-col gap-5">
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-        <p className="text-sm leading-relaxed text-slate-300">
-          每個調都有七個「順階和弦」：把音階每個音當根音、隔音疊三度蓋出來。
-          目標是看到 <span className="font-mono text-amber-300">IVM7</span>、
-          <span className="font-mono text-amber-300">V7</span> 能
-          <span className="text-amber-300">一秒反射</span>出和弦代號——
-          這張表就是之後所有進行分析的字典。
-        </p>
-      </div>
+      <PageIntro
+        storageKey="diatonic"
+        phase="階段 4 · 調性與和聲功能"
+        what="每個調都有七個「順階和弦」：把音階每個音當根音、隔音疊三度蓋出來。這張表是之後所有進行分析的字典。"
+        steps={[
+          "選一個「調」和「大調／小調」——新手從 C 大調開始",
+          "看表格：每一列是一個級數（I、IIm…），可點和弦名試聽三和弦與七和弦",
+          "讀每列右側的功能角色（主／屬／下屬…），理解它在歌裡扮演什麼",
+        ]}
+        notes={[
+          "目標：看到級數 IVM7、V7 能一秒反射出是哪個和弦",
+          "大調順階七和弦永遠是 IM7・IIm7・IIIm7・IVM7・V7・VIm7・VIIm7♭5",
+        ]}
+      />
 
       {/* 調與模式選擇 */}
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3">

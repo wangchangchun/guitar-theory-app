@@ -3,6 +3,7 @@ import { SCALES } from "../data/scales";
 import { noteToPc, spellChordTones } from "../data/theory";
 import { playMidiNotes } from "../audio/audioEngine";
 import { Fretboard } from "../components/fretboard/Fretboard";
+import { PageIntro } from "../components/PageIntro";
 
 const ROOT_OPTIONS = [
   "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B",
@@ -54,6 +55,21 @@ export function ScalesPage() {
 
   return (
     <div className="flex flex-col gap-5">
+      <PageIntro
+        storageKey="scales"
+        phase="階段 2 · 指板導航"
+        what="把音階畫在整片指板上：看它由哪些音組成、每個把位長什麼樣、搖滾情境怎麼用。"
+        steps={[
+          "先選「根音」和一條音階——新手直接用預設的 A → 小調五聲音階",
+          "按「▶ 播放音階」聽整條，再點指板上任一個音單獨試聽",
+          "用「把位」按鈕一次只看一段指型，把位外的音會變暗，比較好記",
+        ]}
+        notes={[
+          "右上可切換顯示「級數」或「音名」；級數＝該音與根音的音程關係",
+          "想背「每弦精確按哪幾個音」的標準指型，到「指型把位」頁",
+        ]}
+      />
+
       {/* 根音選擇 */}
       <div>
         <h3 className="mb-2 text-sm font-semibold text-slate-300">根音</h3>
