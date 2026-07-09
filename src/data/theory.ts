@@ -37,6 +37,16 @@ export function intervalOf(semitones: number): IntervalDef {
   return found;
 }
 
+/** 一個八度內每個半音對應的級數記號，供指板圖標示每條弦相對根音幾度 */
+const DEGREE_BY_SEMITONE = [
+  "1", "♭2", "2", "♭3", "3", "4", "♭5", "5", "♭6", "6", "♭7", "7",
+];
+
+/** 給某音相對根音的半音距離，回傳級數記號（自動收斂到一個八度內） */
+export function degreeLabel(semitonesFromRoot: number): string {
+  return DEGREE_BY_SEMITONE[((semitonesFromRoot % 12) + 12) % 12];
+}
+
 export interface ChordFormula {
   quality: ChordQuality;
   /** 接在根音後的記號，例如 "m7"；大三和弦為空字串 */
