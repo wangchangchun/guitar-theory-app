@@ -1,6 +1,11 @@
 import type { ChordQuality } from "../../types/music";
 import { QUALITY_LABELS } from "../../types/music";
-import { FORMULA_LIST, intervalOf, spellChordTones } from "../../data/theory";
+import {
+  FORMULA_LIST,
+  intervalOf,
+  noteToPc,
+  spellChordTones,
+} from "../../data/theory";
 import { findChordShape } from "../../data/chordLookup";
 import { playChord } from "../../audio/audioEngine";
 import { ChordDiagram } from "../fretboard/ChordDiagram";
@@ -19,20 +24,40 @@ interface Props {
  * 每種變化附上按法圖，點擊即可試聽。
  */
 export function ChordFamilySection({ root, currentQuality }: Props) {
+  const rootPc = noteToPc(root);
   return (
     <section className="mt-8">
       <h2 className="mb-2 text-lg font-bold text-slate-100">
         🎓 和弦變化教室：<span className="text-amber-400">{root} 家族</span>
       </h2>
-      <p className="mb-4 text-sm leading-relaxed text-slate-400">
+      <p className="mb-2 text-sm leading-relaxed text-slate-400">
         和弦是從根音出發、按「級數」往上疊音蓋出來的：大三和弦的公式是
         <span className="mx-1 font-mono text-amber-300">1 · 3 · 5</span>。
-        只要動其中一個音、或再疊一個音，就會變出下面這些親戚——
-        <span className="text-amber-300">黃色</span>
-        標記就是與大三和弦不同的地方。每列都寫著
+        只要動其中一個音、或再疊一個音，就會變出下面這些親戚。每列都寫著
         <span className="mx-1 text-amber-300">怎麼變化</span>（動了哪個音）與
         <span className="mx-1 text-sky-300">什麼時候用</span>
         （實戰時機）。點和弦名或按法圖可以試聽比較。
+      </p>
+      <p className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+        <span>按法圖上的數字＝每條弦相對根音的級數：</span>
+        <span className="inline-flex items-center gap-1">
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-700 text-[9px] font-bold text-amber-300 ring-2 ring-amber-500">
+            1
+          </span>
+          加圈＝根音
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[9px] font-bold text-slate-950">
+            ♭3
+          </span>
+          琥珀＝與大三和弦不同的音
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-700 text-[9px] font-bold text-slate-200">
+            5
+          </span>
+          灰＝沒動到的音
+        </span>
       </p>
 
       <div className="divide-y divide-slate-800 rounded-xl border border-slate-800 bg-slate-900">
@@ -64,7 +89,7 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
                 className="shrink-0 rounded-lg transition-colors hover:bg-slate-800/60"
                 title={`${name} 按法，點擊試聽`}
               >
-                <ChordDiagram shape={shape} width={92} />
+                <ChordDiagram shape={shape} width={104} rootPc={rootPc} />
               </button>
 
               <div className="flex gap-1.5">

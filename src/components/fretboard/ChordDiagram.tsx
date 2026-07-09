@@ -1,18 +1,45 @@
 import type { ChordShape } from "../../types/music";
+import { STANDARD_TUNING_MIDI } from "../../types/music";
+import { degreeLabel } from "../../data/theory";
 
 interface ChordDiagramProps {
   shape: ChordShape;
   /** 圖形寬度（px），高度依比例縮放 */
   width?: number;
   className?: string;
+  /**
+   * 級數模式：給定根音 pitch class（0 = C），每條發聲的弦改標「相對根音的級數」，
+   * 根音加圈、與大三和弦不同的音用琥珀色highlight。用在和弦變化教室，
+   * 讓「把 3 降半音」這類文字能對到指板圖上的哪個點。
+   */
+  rootPc?: number;
 }
 
 const STRING_COUNT = 6;
 
+/** 大三和弦的音程集合（根音·大三度·完全五度），用來判斷哪個音被動過 */
+const MAJOR_SET = new Set([0, 4, 7]);
+
 /**
  * 單一和弦指板圖（直式：琴枕在上，左側為第六弦/低音 E）
  */
-export function ChordDiagram({ shape, width = 160, className }: ChordDiagramProps) {
+export function ChordDiagram({
+  shape,
+  width = 160,
+  className,
+  rootPc,
+}: ChordDiagramProps) {
+  const showDegrees = rootPc != null;
+
+  /** 某條弦某格發出的音相對根音的資訊 */
+  const noteInfo = (stringIndex: number, fret: number) => {
+    const semi = ((STANDARD_TUNING_MIDI[stringIndex] + fret - rootPc!) % 12 + 12) % 12;
+    return {
+      degree: degreeLabel(semi),
+      isRoot: semi === 0,
+      isChanged: !MAJOR_SET.has(semi),
+    };
+  };
   const frettedValues = shape.frets.filter(
     (f): f is number => typeof f === "number" && f > 0,
   );
@@ -81,7 +108,7 @@ export function ChordDiagram({ shape, width = 160, className }: ChordDiagramProp
         />
       ))}
 
-      {/* 弦頂端標記：o = 空弦、x = 悶音 */}
+      {/* 弦頂端標記：o = 空弦、x = 悶音；級數模式下空弦改標級數圓點 */}
       {shape.frets.map((fret, i) => {
         const x = stringX(i);
         const y = top - 14;
@@ -93,6 +120,26 @@ export function ChordDiagram({ shape, width = 160, className }: ChordDiagramProp
           );
         }
         if (fret === 0) {
+          if (showDegrees) {
+            const info = noteInfo(i, 0);
+            const fill = info.isChanged ? "#f59e0b" : "#1e293b";
+            const textFill = info.isChanged ? "#1c1204" : info.isRoot ? "#fbbf24" : "#cbd5e1";
+            return (
+              <g key={`mark-${i}`}>
+                <circle
+                  cx={x}
+                  cy={y - 3}
+                  r={8}
+                  fill={fill}
+                  stroke={info.isRoot ? "#f59e0b" : "#475569"}
+                  strokeWidth={info.isRoot ? 2 : 1}
+                />
+                <text x={x} y={y} fontSize={9} fill={textFill} textAnchor="middle" fontWeight={700}>
+                  {info.degree}
+                </text>
+              </g>
+            );
+          }
           return (
             <circle key={`mark-${i}`} cx={x} cy={y - 4} r={4.5} fill="none" stroke="#e2e8f0" strokeWidth={1.5} />
           );
@@ -117,11 +164,33 @@ export function ChordDiagram({ shape, width = 160, className }: ChordDiagramProp
         />
       )}
 
-      {/* 手指按壓點 */}
+      {/* 按壓點：預設標手指編號；級數模式改標級數（根音加圈、變化音琥珀色） */}
       {shape.frets.map((fret, i) => {
         if (typeof fret !== "number" || fret === 0) return null;
         const x = stringX(i);
         const y = fretY(fret);
+
+        if (showDegrees) {
+          const info = noteInfo(i, fret);
+          const fill = info.isChanged ? "#f59e0b" : "#334155";
+          const textFill = info.isChanged ? "#1c1204" : info.isRoot ? "#fbbf24" : "#e2e8f0";
+          return (
+            <g key={`dot-${i}`}>
+              <circle
+                cx={x}
+                cy={y}
+                r={dotRadius}
+                fill={fill}
+                stroke={info.isRoot ? "#f59e0b" : "none"}
+                strokeWidth={info.isRoot ? 2.5 : 0}
+              />
+              <text x={x} y={y + 3.5} fontSize={9} fill={textFill} textAnchor="middle" fontWeight={700}>
+                {info.degree}
+              </text>
+            </g>
+          );
+        }
+
         const finger = shape.fingers[i];
         return (
           <g key={`dot-${i}`}>
