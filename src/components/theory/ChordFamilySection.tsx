@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { ChordQuality } from "../../types/music";
 import { QUALITY_LABELS } from "../../types/music";
 import {
@@ -6,7 +7,7 @@ import {
   noteToPc,
   spellChordTones,
 } from "../../data/theory";
-import { findChordShape } from "../../data/chordLookup";
+import { findChordShape, findMovableAShape } from "../../data/chordLookup";
 import { playChord } from "../../audio/audioEngine";
 import { ChordDiagram } from "../fretboard/ChordDiagram";
 
@@ -25,6 +26,7 @@ interface Props {
  */
 export function ChordFamilySection({ root, currentQuality }: Props) {
   const rootPc = noteToPc(root);
+  const [sameShape, setSameShape] = useState(false);
   return (
     <section className="mt-8">
       <h2 className="mb-2 text-lg font-bold text-slate-100">
@@ -60,11 +62,54 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
         </span>
       </p>
 
+      {/* 按法模式切換 */}
+      <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
+        <span className="text-xs font-semibold text-slate-400">按法：</span>
+        <div className="flex overflow-hidden rounded-lg border border-slate-700 text-xs">
+          <button
+            onClick={() => setSameShape(false)}
+            className={`px-3 py-1.5 font-medium ${
+              !sameShape ? "bg-slate-700 text-amber-300" : "text-slate-400"
+            }`}
+          >
+            實用按法
+          </button>
+          <button
+            onClick={() => setSameShape(true)}
+            className={`px-3 py-1.5 font-medium ${
+              sameShape ? "bg-slate-700 text-amber-300" : "text-slate-400"
+            }`}
+          >
+            同把位對照（A 型）
+          </button>
+        </div>
+        <span className="text-xs text-slate-500">
+          {sameShape
+            ? "全部用第五弦根音的可移動手型停在同一把位——只有變動的音會移動，看清「其實只動一個音」。"
+            : "顯示每個和弦最好按的實用手型（多為開放和弦）。"}
+        </span>
+      </div>
+
+      {!sameShape && (
+        <p className="mb-4 rounded-lg border border-slate-800 bg-slate-900/60 p-3 text-xs leading-relaxed text-slate-400">
+          <span className="font-semibold text-amber-300">
+            為什麼有些變化會換把位？
+          </span>{" "}
+          開放和弦（像 C）借用了空弦音，而空弦沒辦法「壓下去降半音」——開放 C
+          的高音是空弦 E（正好是 3 音），要變 Cm 得把 E 降成
+          E♭，空弦做不到，只好整個換成每個音都用手指按、可以自由變音的封閉／可移動手型。
+          反之 Am→A、Em→E 沒有動到借用的空弦，就能原地只換一根手指。
+          想在同一位置看清變化，切到「同把位對照」。
+        </p>
+      )}
+
       <div className="divide-y divide-slate-800 rounded-xl border border-slate-800 bg-slate-900">
         {FORMULA_LIST.map((f) => {
           const name = root + f.suffix;
           const tones = spellChordTones(root, f.intervals);
-          const shape = findChordShape(root, f.quality);
+          const shape = sameShape
+            ? findMovableAShape(root, f.quality)
+            : findChordShape(root, f.quality);
           const active = f.quality === currentQuality;
           return (
             <div

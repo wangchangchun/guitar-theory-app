@@ -157,30 +157,19 @@ export function findShapeForName(chordName: string): ChordShape {
   return findChordShape(root, quality);
 }
 
-export function findChordShape(root: string, quality: ChordQuality): ChordShape {
+/** 把可移動手型套用到指定把位，產生實際按法 */
+function buildFromForm(
+  form: MovableForm,
+  root: string,
+  quality: ChordQuality,
+  base: number,
+): ChordShape {
   const name = root + CHORD_FORMULAS[quality].suffix;
-  const existing = CHORDS.find(
-    (c) => c.chordName === name && c.quality === quality,
-  );
-  if (existing) return existing;
-
-  // 沒有現成按法：以可移動手型產生，挑把位最低的
-  const rootPc = noteToPc(root);
-  const candidates = MOVABLE_FORMS[quality]
-    .map((form) => {
-      const openPc = form.rootString === 6 ? E_OPEN_PC : A_OPEN_PC;
-      let base = (rootPc - openPc + 12) % 12;
-      if (base === 0) base = 12;
-      return { form, base };
-    })
-    .sort((a, b) => a.base - b.base);
-
-  const { form, base } = candidates[0];
   const frets: FretValue[] = form.relFrets.map((f) =>
     f === "x" ? "x" : f + base,
   );
   return {
-    id: `gen-${name}`,
+    id: `gen-${name}-s${form.rootString}`,
     chordName: name,
     quality,
     positionType: form.barre ? "barre" : "movable",
@@ -194,4 +183,43 @@ export function findChordShape(root: string, quality: ChordQuality): ChordShape 
         }
       : undefined,
   };
+}
+
+/** 手型的封閉把位：根音落在第幾格 */
+function formBase(form: MovableForm, rootPc: number): number {
+  const openPc = form.rootString === 6 ? E_OPEN_PC : A_OPEN_PC;
+  let base = (rootPc - openPc + 12) % 12;
+  if (base === 0) base = 12;
+  return base;
+}
+
+export function findChordShape(root: string, quality: ChordQuality): ChordShape {
+  const name = root + CHORD_FORMULAS[quality].suffix;
+  const existing = CHORDS.find(
+    (c) => c.chordName === name && c.quality === quality,
+  );
+  if (existing) return existing;
+
+  // 沒有現成按法：以可移動手型產生，挑把位最低的
+  const rootPc = noteToPc(root);
+  const candidates = MOVABLE_FORMS[quality]
+    .map((form) => ({ form, base: formBase(form, rootPc) }))
+    .sort((a, b) => a.base - b.base);
+
+  const { form, base } = candidates[0];
+  return buildFromForm(form, root, quality, base);
+}
+
+/**
+ * 同把位對照用：強制以「A 型」（根音在第五弦）可移動手型產生按法，
+ * 讓同一根音的整個家族停在同一個把位，只有變動的音會移動——
+ * 一眼看清 C→Cm 這類「其實只動一個音」的變化。所有性質都有 A 型手型。
+ */
+export function findMovableAShape(
+  root: string,
+  quality: ChordQuality,
+): ChordShape {
+  const forms = MOVABLE_FORMS[quality];
+  const form = forms.find((f) => f.rootString === 5) ?? forms[0];
+  return buildFromForm(form, root, quality, formBase(form, noteToPc(root)));
 }
