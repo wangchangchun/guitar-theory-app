@@ -9,6 +9,30 @@ const ROOT_OPTIONS = [
   "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B",
 ];
 
+/** 音階依難易度分組：新手照組別由上往下學 */
+const SCALE_TIERS: { label: string; badge: string; ids: string[] }[] = [
+  {
+    label: "入門",
+    badge: "bg-emerald-500/15 text-emerald-300",
+    ids: ["minor-pentatonic", "major-pentatonic"],
+  },
+  {
+    label: "核心",
+    badge: "bg-sky-500/15 text-sky-300",
+    ids: ["major", "natural-minor"],
+  },
+  {
+    label: "進階",
+    badge: "bg-amber-500/15 text-amber-300",
+    ids: ["blues", "harmonic-minor"],
+  },
+  {
+    label: "挑戰",
+    badge: "bg-rose-500/15 text-rose-300",
+    ids: ["dorian", "mixolydian"],
+  },
+];
+
 /**
  * 音階教學：選根音與音階，在全指板上高亮音階音，
  * 可切換級數/音名顯示、點音試聽、播放整條音階。
@@ -58,11 +82,47 @@ export function ScalesPage() {
       <PageIntro
         storageKey="scales"
         phase="階段 2 · 指板導航"
-        what="把音階畫在整片指板上：看它由哪些音組成、每個把位長什麼樣、搖滾情境怎麼用。"
-        steps={[
-          "先選「根音」和一條音階——新手直接用預設的 A → 小調五聲音階",
-          "按「▶ 播放音階」聽整條，再點指板上任一個音單獨試聽",
-          "用「把位」按鈕一次只看一段指型，把位外的音會變暗，比較好記",
+        what="把音階畫在整片指板上：看它由哪些音組成、每個把位長什麼樣、搖滾情境怎麼用。音階選單已按難易度分組，照順序學。"
+        lessons={[
+          {
+            level: "入門",
+            title: "第一條音階：小調五聲",
+            learn:
+              "用預設的 A＋小調五聲音階，按「♪ 播放音階」聽整條，切到「把位 1」只看第 5–8 格那段指型。",
+            guitar:
+              "在第 5–8 格跟彈第 1 把位，上行下行各三次，邊彈邊唱級數「1、♭3、4、5、♭7」。",
+          },
+          {
+            level: "入門",
+            title: "參考原點：大調音階",
+            learn:
+              "切到大調音階聽「Do Re Mi」——其他音階的 ♭3、♭7 都是相對它而言，先把它的聲音刻進耳朵。",
+            guitar:
+              "從第五弦第 3 格的 C 出發彈一個八度的 C 大調，邊彈邊唱音名 C-D-E-F-G-A-B-C。",
+          },
+          {
+            level: "進階",
+            title: "把位（Box）串接",
+            learn:
+              "回到小調五聲，用把位按鈕 1→2→3 逐段檢視：相鄰把位共用一半的音，這就是它們咬合的方式。",
+            guitar:
+              "第 1 把位彈到第一弦最高音，沿第一弦滑 3 格接第 2 把位往回下行——體驗滑音換把位。",
+          },
+          {
+            level: "進階",
+            title: "藍調音與調式的一音之差",
+            learn:
+              "切藍調音階看青色的 ♭5 藍調音；再比較自然小調與 Dorian——只差 ♭6 還原成 6。",
+            guitar:
+              "在小調五聲裡把 ♭5 當滑音經過（如第六弦 6 格滑 7 格）；彈 A 自然小調再把所有 F 改成 F#，聽 Dorian 的洋氣。",
+          },
+          {
+            level: "挑戰",
+            title: "和聲小調的拉力",
+            learn: "切和聲小調：自然小調把 ♭7 升回 7，就為了讓 V7→Im 有回家的力量。",
+            guitar:
+              "彈 Am–E7–Am 循環，在 E7 那小節把所有 G 換成 G#——聽「回家」的力量瞬間變強。",
+          },
         ]}
         notes={[
           "右上可切換顯示「級數」或「音名」；級數＝該音與根音的音程關係",
@@ -90,22 +150,36 @@ export function ScalesPage() {
         </div>
       </div>
 
-      {/* 音階選擇 */}
+      {/* 音階選擇（依難易度分組） */}
       <div>
-        <h3 className="mb-2 text-sm font-semibold text-slate-300">音階</h3>
-        <div className="flex flex-wrap gap-2">
-          {SCALES.map((s) => (
-            <button
-              key={s.id}
-              onClick={() => selectScale(s.id)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                scaleId === s.id
-                  ? "bg-amber-500 text-slate-950"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
-              }`}
-            >
-              {s.name}
-            </button>
+        <h3 className="mb-2 text-sm font-semibold text-slate-300">
+          音階（照難易度由上往下學）
+        </h3>
+        <div className="flex flex-col gap-2">
+          {SCALE_TIERS.map((tier) => (
+            <div key={tier.label} className="flex flex-wrap items-center gap-2">
+              <span
+                className={`w-12 shrink-0 rounded-full px-2 py-0.5 text-center text-[11px] font-semibold ${tier.badge}`}
+              >
+                {tier.label}
+              </span>
+              {tier.ids.map((id) => {
+                const s = SCALES.find((x) => x.id === id)!;
+                return (
+                  <button
+                    key={s.id}
+                    onClick={() => selectScale(s.id)}
+                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                      scaleId === s.id
+                        ? "bg-amber-500 text-slate-950"
+                        : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                    }`}
+                  >
+                    {s.name}
+                  </button>
+                );
+              })}
+            </div>
           ))}
         </div>
       </div>
