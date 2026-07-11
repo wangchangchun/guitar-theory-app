@@ -9,6 +9,8 @@ import {
 } from "../data/theory";
 import { playMidiNotes } from "../audio/audioEngine";
 import { PageIntro } from "../components/PageIntro";
+import { PianoKeys } from "../components/PianoKeys";
+
 
 const MAJOR_SCALE = [0, 2, 4, 5, 7, 9, 11];
 const useFlatsForKey = (key: string) => key.includes("♭") || key === "F";
@@ -281,6 +283,40 @@ export function CircleOfFifthsPage() {
             </p>
           </div>
         </aside>
+      </div>
+
+      {/* 鋼琴輔助：一格只差一個音 */}
+      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
+        <h3 className="mb-1 text-base font-bold text-slate-100">
+          🎹 用鋼琴看「順時針一格＝只差一個音」
+        </h3>
+        <p className="mb-3 text-sm leading-relaxed text-slate-400">
+          下面是 <span className="font-bold text-amber-300">{k.major} 大調</span>
+          的七個音（琥珀色鍵，最左邊是主音）。往順時針走到{" "}
+          <span className="font-bold text-slate-100">
+            {CIRCLE_KEYS[cwIdx].major} 大調
+          </span>
+          時，只有
+          <span className="mx-1 font-mono font-bold text-cyan-300">
+            {pcToName(keyPc + 5, useFlats)}→{pcToName(keyPc + 6, useFlats)}
+          </span>
+          這一個音升高（青色鍵）——其他六個音全部共用。走一格改一個音、越走越多，
+          這就是調號的 ♯ 一個一個累加的原因；逆時針方向同理，一次降一個音。
+        </p>
+        <PianoKeys
+          fromMidi={48 + keyPc}
+          semitones={13}
+          marks={[...MAJOR_SCALE, 12].map((o) => ({
+            midi: 48 + keyPc + o,
+            kind: o % 12 === 5 ? ("accent" as const) : ("scale" as const),
+            label: pcToName(keyPc + o, useFlats),
+            ring: o === 0 || o === 12,
+          }))}
+        />
+        <p className="mt-2 text-xs leading-relaxed text-slate-500">
+          青色鍵＝往 {CIRCLE_KEYS[cwIdx].major} 大調時要升半音的那個音（升上去正好變成新調的第
+          7 音）。點任一鍵可試聽；換圓盤上的調，這張琴鍵會跟著換。
+        </p>
       </div>
     </div>
   );

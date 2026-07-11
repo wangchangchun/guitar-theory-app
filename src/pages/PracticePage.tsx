@@ -10,6 +10,7 @@ import type { ProgressMap } from "../data/progress";
 import { isMastered, loadProgress, saveProgress } from "../data/progress";
 import { useNav } from "../nav";
 import { playMidiNotes } from "../audio/audioEngine";
+import { ChordStrip } from "../components/ChordStrip";
 
 /**
  * 樂理練習：把觀念拆成單元逐一驗收，每單元記錄最佳成績，
@@ -289,6 +290,7 @@ export function PracticePage() {
                   <p className="mt-0.5 text-xs leading-relaxed text-slate-400">
                     {d.how}
                   </p>
+                  {d.chords && <ChordStrip chords={d.chords} width={62} />}
                 </li>
               ))}
             </ol>
@@ -418,6 +420,7 @@ export function PracticePage() {
                 <p className="mt-0.5 text-xs leading-relaxed text-slate-400">
                   {d.how}
                 </p>
+                {d.chords && <ChordStrip chords={d.chords} width={62} />}
               </li>
             ))}
           </ol>

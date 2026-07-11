@@ -37,6 +37,8 @@ export interface GuitarDrill {
   title: string;
   /** 怎麼練＋聽什麼 */
   how: string;
+  /** 要彈的和弦：直接以迷你按法圖列出（可點擊試聽） */
+  chords?: string[];
 }
 
 export interface PracticeUnit {
@@ -1172,6 +1174,7 @@ const UNIT_DEFINITIONS: PracticeUnit[] = [
       {
         title: "跨弦找五度",
         how: "按 power chord 手型（低音弦某格＋高一條弦同格再 +2 格）就是完全五度；相鄰兩弦「同一格」則是完全四度（G→B 弦例外）。用手型記音程，比數格子快。",
+        chords: ["E5", "A5"],
       },
     ],
     build: () =>
@@ -1193,6 +1196,7 @@ const UNIT_DEFINITIONS: PracticeUnit[] = [
       {
         title: "拆解開放和弦",
         how: "刷一次 C 開放和弦，再由低到高一弦一弦彈，對照和弦圖鑑說出每個音是 1、3 還是 5（C=1、E=3、G=5，會重複出現）。六條弦其實只有三個音在輪班。",
+        chords: ["C"],
       },
       {
         title: "高音三弦拼三和弦",
@@ -1201,6 +1205,7 @@ const UNIT_DEFINITIONS: PracticeUnit[] = [
       {
         title: "sus 的吊與放",
         how: "彈 D→Dsus4→D→Dsus2→D（小指在第一弦 3 格勾放、食指提起）。掛留音「吊住」的懸空感、回到 3 音的「落地」感，就是 sus 和弦的全部祕密。",
+        chords: ["D", "Dsus4", "Dsus2"],
       },
     ],
     build: () => buildRound([genTriadTones, genTriadIdentify], 8),
@@ -1218,14 +1223,17 @@ const UNIT_DEFINITIONS: PracticeUnit[] = [
       {
         title: "一根手指的魔法",
         how: "A→Am 只動一根手指（第二弦 2 格→1 格），來回彈聽 3→♭3 的變化；E→Em（第三弦 1 格→放開）同理。體會「只差半音、性格全變」。",
+        chords: ["A", "Am", "E", "Em"],
       },
       {
         title: "三種七度一次聽",
         how: "C（x32010）→Cmaj7（放開第二弦食指 x32000）→C7（小指加按第三弦 3 格 x32310）。同一個和弦疊大七、小七的色差，一分鐘聽完。",
+        chords: ["C", "Cmaj7", "C7"],
       },
       {
         title: "拿掉三度音",
         how: "彈完整的 E 大和弦，再只彈六、五、四弦（E5 強力和弦）。開失真比較：有 3 音會糊、只剩 1 和 5 乾淨有力——這就是搖滾用 power chord 的原因。",
+        chords: ["E", "E5"],
       },
     ],
     build: () => buildRound([genTransformQuestion], 8),
@@ -1243,14 +1251,17 @@ const UNIT_DEFINITIONS: PracticeUnit[] = [
       {
         title: "都會 vs 藍調",
         how: "交替彈 Cmaj7 與 C7——兩者只差半音（B vs B♭），一個夢幻慵懶、一個緊繃想解決。閉上眼睛聽到能分辨為止。",
+        chords: ["Cmaj7", "C7"],
       },
       {
         title: "放鬆的小七",
         how: "Am→Am7 只要放開第三弦 2 格；Em→Em7 放開第四弦 2 格。聽 m7 比 m 圓潤放鬆在哪——Funk/R&B 的節奏吉他就是這個色。",
+        chords: ["Am", "Am7", "Em", "Em7"],
       },
       {
         title: "add9 的亮片",
         how: "C→Cadd9（x32030，小指按第二弦 3 格）來回彈：多出來的 D 音就是「現代感」。很多流行歌前奏只是把三和弦全換成 add9 而已。",
+        chords: ["C", "Cadd9"],
       },
     ],
     build: () => buildRound([genSeventhTones, genSeventhIdentify], 8),
@@ -1272,10 +1283,12 @@ const UNIT_DEFINITIONS: PracticeUnit[] = [
       {
         title: "sus4 蓄力實戰",
         how: "刷 G→Gsus4（320013）→G，當作副歌前的推力；再試 D→Dsus4→D。數一拍吊住、一拍解決，你就會懂為什麼副歌前都要來這一下。",
+        chords: ["G", "Gsus4", "D", "Dsus4"],
       },
       {
         title: "全屬七的藍調",
         how: "用 E7、A7、B7 跟著歌曲進行頁的 12 小節藍調刷一輪——三個和弦全是屬七卻毫無違和，這種「張力就是常態」正是藍調的語言。",
+        chords: ["E7", "A7", "B7"],
       },
     ],
     build: () => pickN(USAGE_SCENARIOS, 8).map(usageQuestionFor),
@@ -1301,6 +1314,7 @@ const UNIT_DEFINITIONS: PracticeUnit[] = [
       {
         title: "和聲小調的拉力",
         how: "彈 Am–E7–Am 循環，輪到 E7 那小節把 solo 裡所有 G 彈成 G#（A 和聲小調）。聽「回家」的力量瞬間變強——這就是升 7 音存在的理由。",
+        chords: ["Am", "E7"],
       },
     ],
     build: () =>
@@ -1389,10 +1403,12 @@ const UNIT_DEFINITIONS: PracticeUnit[] = [
       {
         title: "換和弦瞄 3 音",
         how: "放歌曲進行頁的 I–V–vi–IV 循環當背景，每次換和弦只彈兩顆音：新和弦的根音→3 音。習慣之後把 3 音改成長音落點——這就是 chord tone targeting 的肌肉記憶。",
+        chords: ["C", "G", "Am", "F"],
       },
       {
         title: "三全音解決",
         how: "自己錄或循環 G7→C 的伴奏，單音彈 B→C（3→1）、再彈 F→E（♭7→3）。兩條半音線同時收攏的「啊，回家了」感，就是屬七和弦拉力的物理現場。",
+        chords: ["G7", "C"],
       },
     ],
     build: () =>
@@ -1415,14 +1431,17 @@ const UNIT_DEFINITIONS: PracticeUnit[] = [
       {
         title: "順階爬梯",
         how: "C 大調從 I 彈到 VII 再回家：C–Dm–Em–F–G–Am–Bdim–C，邊彈邊唸「一、二 m、三 m、四、五、六 m、七減」。爬熟一個調，其他調只是換起點。",
+        chords: ["C", "Dm", "Em", "F", "G", "Am", "Bdim"],
       },
       {
         title: "1–6–2–5 循環",
         how: "彈 C–Am–Dm–G 不停循環（爵士標準的 I–VIm–IIm–V）。全是調內和弦，怎麼接都和諧——感受「一家人」的安全感，之後聽到借用和弦才知道哪裡「出格」。",
+        chords: ["C", "Am", "Dm", "G"],
       },
       {
         title: "級數搬家",
         how: "把同樣的級數 I–VIm–IIm–V 搬到 G 大調彈：G–Em–Am–D。和弦全變了、感覺完全一樣——級數不變、和弦跟調跑，這就是為什麼要用級數思考。",
+        chords: ["G", "Em", "Am", "D"],
       },
     ],
     build: () =>
@@ -1445,14 +1464,17 @@ const UNIT_DEFINITIONS: PracticeUnit[] = [
       {
         title: "催淚彈 A/B 測試",
         how: "先彈 C–F–C，再彈 C–F–Fm–C。Fm 那一步只動了一個音（F 和弦裡的 A→A♭），眼淚就是從那半音來的。自己彈一次比聽一百次講解都有效。",
+        chords: ["C", "F", "Fm"],
       },
       {
         title: "副屬拉力對照",
         how: "彈 C–Am–Dm–G 一輪，再把 Am 換成 A7 彈 C–A7–Dm–G。A7 多出來的 C# 音把音樂用力推向 Dm——這就是副屬和弦 V/II 的推力，動漫和昭和歌謠到處都是。",
+        chords: ["C", "Am", "A7", "Dm", "G"],
       },
       {
         title: "三種回家方式",
         how: "各彈幾次：G7→C（完全終止，最強的回家）、F→C（變格終止，教堂「阿們」的溫柔）、G7→Am（假終止，說好回家卻繞去別人家）。終止式決定樂句的標點符號。",
+        chords: ["G7", "C", "F", "Am"],
       },
     ],
     build: () =>
@@ -1479,10 +1501,12 @@ const UNIT_DEFINITIONS: PracticeUnit[] = [
       {
         title: "近親 vs 遠親轉調",
         how: "彈 C 調的 C–F–G，接著轉 G 調彈 G–C–D（只差一個 F→F#，耳朵幾乎無痛），再直接跳 F# 調彈 F#–B–C#——正對面的調，聽聽有多突兀。距離感自己彈最準。",
+        chords: ["C", "F", "G", "D"],
       },
       {
         title: "II–V–I 傳送帶",
         how: "彈 Dm7–G7–Cmaj7，然後整組沿逆時針搬：Gm7–C7–Fmaj7，再 Cm7–F7–B♭maj7。每組的 I 變成下一組的 V 方向鄰居——爵士就是坐著這條傳送帶環遊 12 個調。",
+        chords: ["Dm7", "G7", "Cmaj7", "Gm7", "C7", "Fmaj7"],
       },
     ],
     build: () =>
