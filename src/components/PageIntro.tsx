@@ -1,11 +1,6 @@
 import { useState } from "react";
 import { useNav } from "../nav";
-import {
-  findMovableShapeForName,
-  findShapeForName,
-} from "../data/chordLookup";
-import { playChord } from "../audio/audioEngine";
-import { ChordDiagram } from "./fretboard/ChordDiagram";
+import { ChordStrip } from "./ChordStrip";
 
 /**
  * 每頁的「循序漸進學習清單」：步驟依難易度排序（入門→進階→挑戰），
@@ -176,26 +171,10 @@ export function PageIntro({ storageKey, phase, what, lessons, notes }: Props) {
                         <span className="text-slate-400">{step.guitar}</span>
                       </p>
                       {step.chords && step.chords.length > 0 && (
-                        <div className="mt-2 flex flex-wrap gap-1.5">
-                          {step.chords.map((name) => {
-                            const shape = step.movable
-                              ? findMovableShapeForName(name)
-                              : findShapeForName(name);
-                            return (
-                              <button
-                                key={name}
-                                onClick={() => playChord(shape, "strum")}
-                                className="flex flex-col items-center rounded-lg border border-slate-800 bg-slate-900/80 px-1.5 pt-1 transition-colors hover:border-amber-500/60"
-                                title={`${name} 按法，點擊試聽`}
-                              >
-                                <span className="text-[11px] font-bold leading-none text-amber-300">
-                                  ♪ {name}
-                                </span>
-                                <ChordDiagram shape={shape} width={68} />
-                              </button>
-                            );
-                          })}
-                        </div>
+                        <ChordStrip
+                          chords={step.chords}
+                          movable={step.movable}
+                        />
                       )}
                     </div>
                   </div>

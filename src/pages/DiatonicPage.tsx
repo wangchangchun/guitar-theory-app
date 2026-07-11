@@ -2,9 +2,11 @@ import { useState } from "react";
 import { MAJOR_DEGREES, MINOR_DEGREES } from "../data/diatonic";
 import { CHORD_FORMULAS, noteToPc, pcToName, spellChordTones } from "../data/theory";
 import { findChordShape } from "../data/chordLookup";
-import { playChord } from "../audio/audioEngine";
+import { playChord, playMidiNotes } from "../audio/audioEngine";
 import { ChordDiagram } from "../components/fretboard/ChordDiagram";
 import { PageIntro } from "../components/PageIntro";
+import type { PianoMark } from "../components/PianoKeys";
+import { PianoKeys } from "../components/PianoKeys";
 
 const KEY_OPTIONS = [
   "C", "D♭", "D", "E♭", "E", "F", "F#", "G", "A♭", "A", "B♭", "B",
@@ -21,13 +23,44 @@ const MINOR_SCALE = [0, 2, 3, 5, 7, 8, 10];
 export function DiatonicPage() {
   const [keyName, setKeyName] = useState("C");
   const [mode, setMode] = useState<"major" | "minor">("major");
+  const [stackDegree, setStackDegree] = useState(0);
 
   const degrees = mode === "major" ? MAJOR_DEGREES : MINOR_DEGREES;
   const keyPc = noteToPc(keyName);
   const useFlats = useFlatsForKey(keyName);
-  const scaleNotes = (mode === "major" ? MAJOR_SCALE : MINOR_SCALE).map((s) =>
-    pcToName(keyPc + s, useFlats),
+  const scaleIntervals = mode === "major" ? MAJOR_SCALE : MINOR_SCALE;
+  const scaleNotes = scaleIntervals.map((s) => pcToName(keyPc + s, useFlats));
+
+  // ── 鋼琴輔助：隔音疊三度 ──
+  // 琴鍵從主音開始畫兩個八度；音階延伸三個八度以便高音級也能疊四層
+  const pianoBase = 48 + keyPc;
+  const extended = [
+    ...scaleIntervals,
+    ...scaleIntervals.map((s) => s + 12),
+    ...scaleIntervals.map((s) => s + 24),
+  ];
+  const stackOffsets = [0, 2, 4, 6].map((k) => extended[stackDegree + k]);
+  const stackEntry = degrees[stackDegree];
+  const stackChordName =
+    pcToName(keyPc + stackEntry.semitones, useFlats) +
+    CHORD_FORMULAS[stackEntry.seventhQuality].suffix;
+  const stackNoteNames = stackOffsets.map((o) =>
+    pcToName(keyPc + o, useFlats),
   );
+  const pianoMarks: PianoMark[] = extended
+    .filter((o) => o <= 24)
+    .map((o) => ({
+      midi: pianoBase + o,
+      kind: "scale" as const,
+      label: pcToName(keyPc + o, useFlats),
+    }));
+  for (const [i, o] of stackOffsets.entries()) {
+    const mark = pianoMarks.find((m) => m.midi === pianoBase + o);
+    if (mark) {
+      mark.kind = "stack";
+      if (i === 0) mark.ring = true;
+    }
+  }
 
   return (
     <div className="flex flex-col gap-5">
@@ -126,6 +159,65 @@ export function DiatonicPage() {
               {n}
             </span>
           ))}
+        </p>
+      </div>
+
+      {/* 鋼琴輔助：隔音疊三度 */}
+      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
+        <h3 className="mb-1 text-base font-bold text-slate-100">
+          🎹 「隔音疊三度」是什麼？用鋼琴看最清楚
+        </h3>
+        <p className="mb-3 text-sm leading-relaxed text-slate-400">
+          下面是 {keyName} {mode === "major" ? "大" : "小"}調的七個音（琥珀色鍵，最左邊就是主音
+          {keyName}）。選一個級數：從那個音出發
+          <span className="mx-1 text-amber-300">「隔一個拿一個」</span>
+          連拿四層（亮色鍵），疊出來的就是該級的順階七和弦——
+          <span className="text-amber-300">大小性質不用背</span>
+          ，是音階裡全音半音的位置自己決定的。
+        </p>
+        <div className="mb-3 flex flex-wrap items-center gap-1.5">
+          <span className="text-xs font-semibold text-slate-400">級數：</span>
+          {degrees.map((d, i) => (
+            <button
+              key={d.seventhNumeral}
+              onClick={() => setStackDegree(i)}
+              className={`rounded-lg px-3 py-1 font-mono text-xs font-semibold transition-colors ${
+                stackDegree === i
+                  ? "bg-amber-500 text-slate-950"
+                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+              }`}
+            >
+              {d.seventhNumeral}
+            </button>
+          ))}
+        </div>
+        <PianoKeys fromMidi={pianoBase} semitones={25} marks={pianoMarks} />
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-slate-300">
+            <span className="font-mono font-bold text-amber-300">
+              {stackEntry.seventhNumeral}
+            </span>{" "}
+            ＝ 第 {stackDegree + 1} 個音出發隔一個拿一個 →{" "}
+            <span className="font-mono text-amber-300">
+              {stackNoteNames.join("·")}
+            </span>{" "}
+            ＝ <span className="font-bold text-slate-100">{stackChordName}</span>
+          </p>
+          <button
+            onClick={() =>
+              playMidiNotes(stackOffsets.map((o) => pianoBase + o))
+            }
+            className="rounded-lg bg-amber-500 px-4 py-1.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-amber-400"
+          >
+            ♪ 聽這個和弦
+          </button>
+        </div>
+        <p className="mt-2 text-xs leading-relaxed text-slate-500">
+          同一個「隔音疊三度」的動作，只因起點不同就疊出大、小、屬、半減——所以
+          {mode === "major"
+            ? "大調永遠是 IM7・IIm7・IIIm7・IVM7・V7・VIm7・VIIm7♭5"
+            : "自然小調永遠是 Im7・IIm7♭5・♭IIIM7・IVm7・Vm7・♭VIM7・♭VII7"}
+          ，換調只是整組平移。點任一鍵可單獨試聽。
         </p>
       </div>
 
