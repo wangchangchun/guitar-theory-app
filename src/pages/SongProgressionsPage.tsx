@@ -100,14 +100,59 @@ function colorize(chord: string, numeral: string, mode: ColorMode): string {
   return chord;
 }
 
+/** 進行清單依難易度分組：新手從入門組由上往下跟刷 */
+const LEVEL_GROUPS: { label: string; badge: string; ids: string[] }[] = [
+  {
+    label: "入門｜三、四個和弦打天下",
+    badge: "text-emerald-300",
+    ids: [
+      "punk-I-IV-V",
+      "axis-I-V-vi-IV",
+      "sad-vi-IV-I-V",
+      "fifties-I-vi-IV-V",
+      "jpop-komuro",
+      "metal-power-i-bVI-bVII",
+    ],
+  },
+  {
+    label: "進階｜經典與日系必修",
+    badge: "text-amber-300",
+    ids: [
+      "jpop-canon",
+      "jpop-oudou",
+      "jpop-4536251",
+      "twelve-bar-blues-E",
+      "andalusian-Am",
+      "mixolydian-D-C-G",
+    ],
+  },
+  {
+    label: "挑戰｜借用・副屬・精緻和聲",
+    badge: "text-rose-300",
+    ids: [
+      "jpop-marusa",
+      "jpop-subdominant-minor",
+      "jpop-bVI-bVII",
+      "secondary-dominant-chain",
+      "jpop-sharp4-halfdim",
+      "jpop-cliche-bassline",
+    ],
+  },
+];
+
+const FIRST_PROGRESSION = PROGRESSIONS.find(
+  (p) => p.id === LEVEL_GROUPS[0].ids[0],
+)!;
+
 /**
  * 歌曲進行：日系＋歐美經典和弦進行資料庫，
  * 附 12 調移調器與節奏引擎（8/16 Beat、琶音、合成鼓組 backbeat）。
+ * 清單依難易度分組，預設從最簡單的進行開始。
  */
 export function SongProgressionsPage() {
-  const [selected, setSelected] = useState<Progression>(PROGRESSIONS[0]);
-  const [keyName, setKeyName] = useState(PROGRESSIONS[0].keyRoot);
-  const [bpm, setBpm] = useState(PROGRESSIONS[0].bpm);
+  const [selected, setSelected] = useState<Progression>(FIRST_PROGRESSION);
+  const [keyName, setKeyName] = useState(FIRST_PROGRESSION.keyRoot);
+  const [bpm, setBpm] = useState(FIRST_PROGRESSION.bpm);
   const [rhythm, setRhythm] = useState<RhythmId>("eight");
   const [drumsOn, setDrumsOn] = useState(true);
   const [colorMode, setColorMode] = useState<ColorMode>("plain");
@@ -217,11 +262,40 @@ export function SongProgressionsPage() {
       <PageIntro
         storageKey="songs"
         phase="階段 5 · 實戰應用"
-        what="把前面學的全部倒進真的和弦進行裡：移調、換節奏、換色彩和弦，還有配對的 solo 音階。"
-        steps={[
-          "左側選一個進行——新手從最上面的「王道進行」開始",
-          "按「▶ 播放」聽伴奏循環，跟著亮起的小節看和弦怎麼換",
-          "試試「Key」移調、切換節奏型與「色彩」，聽同一進行的不同面貌",
+        what="把前面學的全部倒進真的和弦進行裡：移調、換節奏、換色彩和弦，還有配對的 solo 音階。左側清單已按難易度分組，照順序跟刷。"
+        lessons={[
+          {
+            level: "入門",
+            title: "三個和弦打天下",
+            learn: "選「I–IV–V 龐克三和弦」按 ▶ 播放，看亮起的小節怎麼換和弦。",
+            guitar: "跟著伴奏刷 A–D–E，全部下撥、越直越好——態度比技巧重要。",
+          },
+          {
+            level: "入門",
+            title: "四和弦金曲",
+            learn: "選「I–V–vi–IV 四和弦金曲」：I 是家、V 帶動力、vi 轉憂鬱、IV 推回家。",
+            guitar: "用 8 Beat 跟刷 C–G–Am–F 一輪；再選「vi–IV–I–V 感傷搖滾」聽同樣四個和弦換順序變憂鬱。",
+          },
+          {
+            level: "進階",
+            title: "日系必修：王道與卡農",
+            learn: "選「王道進行」（IVM7 起手的懸浮感）與「卡農進行」（低音級進下行），讀說明裡的級數分析。",
+            guitar: "跟刷 Fmaj7–G7–Em7–Am7；卡農進行跟著低音 C–B–A–G 的下行聽開闊感。",
+          },
+          {
+            level: "進階",
+            title: "移調與色彩實驗",
+            learn: "用「Key」把熟了的進行移到 G、D 調；用「色彩」切七和弦版／add9 版聽色差。",
+            guitar: "把四和弦金曲移到 G 調刷一輪（G–D–Em–C）——級數沒變，手型全變，這就是移調。",
+          },
+          {
+            level: "挑戰",
+            title: "藍調、借用與副屬",
+            learn:
+              "選「12 小節藍調」（全屬七）、「IVm 借用（催淚彈）」與「副屬和弦鏈」，讀它們借了哪裡的和弦。",
+            guitar:
+              "E7–A7–B7 跟完 12 小節；再彈 C–F–Fm–C 聽 Fm 那半音的催淚效果；最後配著 solo 建議的音階即興幾句。",
+          },
         ]}
         notes={[
           "每個和弦上方的級數（IVM7、V7…）就是「調性字典」教的順階和弦",
@@ -230,29 +304,41 @@ export function SongProgressionsPage() {
       />
 
       <div className="flex flex-col gap-6 lg:flex-row">
-        {/* 左側：進行清單 */}
+        {/* 左側：進行清單（依難易度分組） */}
         <div className="flex w-full shrink-0 flex-col gap-2 lg:w-72">
-        {PROGRESSIONS.map((p) => (
-          <button
-            key={p.id}
-            onClick={() => selectProgression(p)}
-            className={`rounded-xl border p-3 text-left transition-colors ${
-              selected.id === p.id
-                ? "border-amber-500 bg-slate-800/80"
-                : "border-slate-800 bg-slate-900 hover:border-slate-600"
-            }`}
-          >
-            <div className="mb-1 flex items-center justify-between gap-2">
-              <span className="font-bold text-slate-100">{p.title}</span>
-              <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">
-                {GENRE_LABELS[p.genre]}
-              </span>
-            </div>
-            <p className="font-mono text-xs text-slate-400">
-              {p.steps.slice(0, 4).map((s) => s.numeral).join(" – ")}
-              {p.steps.length > 4 && " …"}
-            </p>
-          </button>
+        {LEVEL_GROUPS.map((group) => (
+          <div key={group.label} className="flex flex-col gap-2">
+            <h3
+              className={`mt-2 text-xs font-bold first:mt-0 ${group.badge}`}
+            >
+              {group.label}
+            </h3>
+            {group.ids.map((id) => {
+              const p = PROGRESSIONS.find((x) => x.id === id)!;
+              return (
+                <button
+                  key={p.id}
+                  onClick={() => selectProgression(p)}
+                  className={`rounded-xl border p-3 text-left transition-colors ${
+                    selected.id === p.id
+                      ? "border-amber-500 bg-slate-800/80"
+                      : "border-slate-800 bg-slate-900 hover:border-slate-600"
+                  }`}
+                >
+                  <div className="mb-1 flex items-center justify-between gap-2">
+                    <span className="font-bold text-slate-100">{p.title}</span>
+                    <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">
+                      {GENRE_LABELS[p.genre]}
+                    </span>
+                  </div>
+                  <p className="font-mono text-xs text-slate-400">
+                    {p.steps.slice(0, 4).map((s) => s.numeral).join(" – ")}
+                    {p.steps.length > 4 && " …"}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
         ))}
       </div>
 

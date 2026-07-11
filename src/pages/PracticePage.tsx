@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import type { PracticeUnit, Question } from "../data/practice";
-import { FINAL_UNIT, MASTERY_RATIO, PRACTICE_UNITS } from "../data/practice";
+import {
+  FINAL_UNIT,
+  MASTERY_RATIO,
+  PRACTICE_UNITS,
+  UNIT_PHASE_GROUPS,
+} from "../data/practice";
 import type { ProgressMap } from "../data/progress";
 import { isMastered, loadProgress, saveProgress } from "../data/progress";
 import { useNav } from "../nav";
@@ -105,57 +110,83 @@ export function PracticePage() {
           </div>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          {PRACTICE_UNITS.map((u, i) => {
-            const p = progress[u.id];
-            const mastered = isMastered(p);
+        <div className="flex flex-col gap-6">
+          {UNIT_PHASE_GROUPS.map((group) => {
+            const units = group.ids.map(
+              (id) => PRACTICE_UNITS.find((u) => u.id === id)!,
+            );
+            const groupMastered = units.filter((u) =>
+              isMastered(progress[u.id]),
+            ).length;
             return (
-              <button
-                key={u.id}
-                onClick={() => startUnit(u)}
-                className={`rounded-xl border p-4 text-left transition-colors ${
-                  mastered
-                    ? "border-emerald-600/60 bg-emerald-950/30 hover:border-emerald-500"
-                    : "border-slate-800 bg-slate-900 hover:border-slate-600"
-                }`}
-              >
-                <div className="mb-1 flex items-center justify-between gap-2">
-                  <span className="font-bold text-slate-100">
-                    {u.emoji} 單元 {i + 1}｜{u.title}
+              <div key={group.title}>
+                <div className="mb-2 flex items-baseline justify-between gap-3">
+                  <h3 className="text-sm font-bold text-slate-300">
+                    {group.title}
+                  </h3>
+                  <span className="font-mono text-xs text-slate-500">
+                    {groupMastered}/{units.length} 精通
                   </span>
-                  {mastered ? (
-                    <span className="shrink-0 rounded-full bg-emerald-600/30 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
-                      ✓ 已精通
-                    </span>
-                  ) : p ? (
-                    <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">
-                      練習中
-                    </span>
-                  ) : (
-                    <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-500">
-                      未挑戰
-                    </span>
-                  )}
                 </div>
-                <p className="mb-2 text-xs leading-relaxed text-slate-400">
-                  {u.tagline}
-                </p>
-                <ul className="mb-2 space-y-0.5">
-                  {u.goals.map((g) => (
-                    <li key={g} className="text-[11px] leading-relaxed text-slate-500">
-                      ・{g}
-                    </li>
-                  ))}
-                </ul>
-                <p className="mb-1 text-[11px] text-amber-300/70">
-                  🎸 附 {u.drills.length} 個上琴應用練習
-                </p>
-                {p && (
-                  <p className="text-[11px] font-mono text-slate-500">
-                    最佳成績 {p.best}/{p.total}・已挑戰 {p.attempts} 輪
-                  </p>
-                )}
-              </button>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {units.map((u) => {
+                    const no = PRACTICE_UNITS.indexOf(u) + 1;
+                    const p = progress[u.id];
+                    const mastered = isMastered(p);
+                    return (
+                      <button
+                        key={u.id}
+                        onClick={() => startUnit(u)}
+                        className={`rounded-xl border p-4 text-left transition-colors ${
+                          mastered
+                            ? "border-emerald-600/60 bg-emerald-950/30 hover:border-emerald-500"
+                            : "border-slate-800 bg-slate-900 hover:border-slate-600"
+                        }`}
+                      >
+                        <div className="mb-1 flex items-center justify-between gap-2">
+                          <span className="font-bold text-slate-100">
+                            {u.emoji} 單元 {no}｜{u.title}
+                          </span>
+                          {mastered ? (
+                            <span className="shrink-0 rounded-full bg-emerald-600/30 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                              ✓ 已精通
+                            </span>
+                          ) : p ? (
+                            <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">
+                              練習中
+                            </span>
+                          ) : (
+                            <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-500">
+                              未挑戰
+                            </span>
+                          )}
+                        </div>
+                        <p className="mb-2 text-xs leading-relaxed text-slate-400">
+                          {u.tagline}
+                        </p>
+                        <ul className="mb-2 space-y-0.5">
+                          {u.goals.map((g) => (
+                            <li
+                              key={g}
+                              className="text-[11px] leading-relaxed text-slate-500"
+                            >
+                              ・{g}
+                            </li>
+                          ))}
+                        </ul>
+                        <p className="mb-1 text-[11px] text-amber-300/70">
+                          🎸 附 {u.drills.length} 個上琴應用練習
+                        </p>
+                        {p && (
+                          <p className="text-[11px] font-mono text-slate-500">
+                            最佳成績 {p.best}/{p.total}・已挑戰 {p.attempts} 輪
+                          </p>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
 

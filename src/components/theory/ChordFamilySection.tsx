@@ -2,7 +2,7 @@ import { useState } from "react";
 import type { ChordQuality } from "../../types/music";
 import { QUALITY_LABELS } from "../../types/music";
 import {
-  FORMULA_LIST,
+  CHORD_FORMULAS,
   intervalOf,
   noteToPc,
   spellChordTones,
@@ -13,6 +13,29 @@ import { ChordDiagram } from "../fretboard/ChordDiagram";
 
 /** 大三和弦的音程集合，用來標記「哪個音被動過了」 */
 const MAJOR_INTERVALS = new Set([0, 4, 7]);
+
+/** 依難易度分層：先三和弦、再掛留與七和弦、最後色彩與功能和弦 */
+const FAMILY_TIERS: {
+  label: string;
+  desc: string;
+  qualities: ChordQuality[];
+}[] = [
+  {
+    label: "入門｜三和弦",
+    desc: "先聽懂 1·3·5 的基準型，以及只動一個音的大小變化",
+    qualities: ["major", "minor", "power"],
+  },
+  {
+    label: "進階｜掛留與七和弦",
+    desc: "換掉 3 音的懸浮感、疊上七度的三種色彩",
+    qualities: ["sus2", "sus4", "dominant7", "major7", "minor7"],
+  },
+  {
+    label: "挑戰｜色彩與功能和弦",
+    desc: "add9／6 的現代復古色，dim／m7♭5 的過渡與功能角色",
+    qualities: ["add9", "6", "m6", "dim", "m7b5"],
+  },
+];
 
 interface Props {
   root: string;
@@ -103,8 +126,18 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
         </p>
       )}
 
-      <div className="divide-y divide-slate-800 rounded-xl border border-slate-800 bg-slate-900">
-        {FORMULA_LIST.map((f) => {
+      <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
+        {FAMILY_TIERS.map((tier) => (
+          <div key={tier.label}>
+            <div className="border-y border-slate-800 bg-slate-950/70 px-4 py-2 first:border-t-0">
+              <span className="text-xs font-bold text-amber-300">
+                {tier.label}
+              </span>
+              <span className="ml-2 text-xs text-slate-500">{tier.desc}</span>
+            </div>
+            <div className="divide-y divide-slate-800">
+              {tier.qualities.map((quality) => {
+                const f = CHORD_FORMULAS[quality];
           const name = root + f.suffix;
           const tones = spellChordTones(root, f.intervals);
           const shape = sameShape
@@ -178,7 +211,10 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
               </div>
             </div>
           );
-        })}
+              })}
+            </div>
+          </div>
+        ))}
       </div>
     </section>
   );

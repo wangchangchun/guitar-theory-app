@@ -1150,7 +1150,7 @@ const genTriadIdentify = () => genIdentifyQuestion(TRIAD_QUALITIES);
 const genSeventhTones = () => genTonesQuestion(SEVENTH_QUALITIES);
 const genSeventhIdentify = () => genIdentifyQuestion(SEVENTH_QUALITIES);
 
-export const PRACTICE_UNITS: PracticeUnit[] = [
+const UNIT_DEFINITIONS: PracticeUnit[] = [
   {
     id: "intervals",
     title: "音程基礎",
@@ -1494,6 +1494,35 @@ export const PRACTICE_UNITS: PracticeUnit[] = [
         ),
         ...pickN(CIRCLE_CONCEPT_QUESTIONS, 3).map(conceptQuestionFor),
       ]),
+  },
+];
+
+/**
+ * 依學習路線的建議順序排列（階段 1→4）：
+ * 單元編號因此就是建議的學習順序，一路由淺入深。
+ */
+const UNIT_ORDER = [
+  "intervals", "triads", "transform", "sevenths",
+  "fretnotes", "scales", "fingering",
+  "caged", "usage",
+  "diatonic", "harmony", "circle",
+] as const;
+
+export const PRACTICE_UNITS: PracticeUnit[] = UNIT_ORDER.map(
+  (id) => UNIT_DEFINITIONS.find((u) => u.id === id)!,
+);
+
+/** 練習選單的階段分組（與學習路線一致），照組別由上而下練 */
+export const UNIT_PHASE_GROUPS: { title: string; ids: string[] }[] = [
+  {
+    title: "階段 1｜和弦地基",
+    ids: ["intervals", "triads", "transform", "sevenths"],
+  },
+  { title: "階段 2｜指板導航", ids: ["fretnotes", "scales", "fingering"] },
+  { title: "階段 3｜橋接和弦與音階", ids: ["caged", "usage"] },
+  {
+    title: "階段 4｜調性與和聲功能",
+    ids: ["diatonic", "harmony", "circle"],
   },
 ];
 
