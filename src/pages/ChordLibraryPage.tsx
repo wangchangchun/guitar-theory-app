@@ -80,6 +80,7 @@ export function ChordLibraryPage() {
               "篩選「大三和弦」，逐一點 E、A、D、G、C 五張卡片：右側會顯示組成音——級數永遠是 1·3·5，只是音名跟著根音跑。",
             guitar:
               "跟著按 E→A→D 三個開放和弦，每個先刷一下、再一弦一弦分解，聽出「六條弦其實只有三個音在輪班」。",
+            chords: ["E", "A", "D", "G", "C"],
           },
           {
             level: "入門",
@@ -88,6 +89,7 @@ export function ChordLibraryPage() {
               "切到「小三和弦」，比較 Em/Am/Dm 和 E/A/D：右側組成音只有 3 變 ♭3 一個差別。",
             guitar:
               "彈 E→Em（第三弦食指放開）、A→Am（第二弦 2 格→1 格），來回聽明亮↔憂鬱——只動一根手指。",
+            chords: ["E", "Em", "A", "Am"],
           },
           {
             level: "進階",
@@ -96,6 +98,7 @@ export function ChordLibraryPage() {
               "看「強力和弦」（只剩 1·5，沒有大小之分）與「掛留和弦」（3 被換成 2 或 4 的懸浮感）。",
             guitar:
               "彈 D→Dsus4→D→Dsus2→D（小指在第一弦勾放）；再彈 E5 只撥六五四弦，配手掌悶音下撥。",
+            chords: ["D", "Dsus4", "Dsus2", "E5"],
           },
           {
             level: "進階",
@@ -104,6 +107,7 @@ export function ChordLibraryPage() {
               "篩選「七和弦」，比較同根音的 7／maj7／m7：差別全在疊上去的那個七度是大是小。",
             guitar:
               "彈 C（x32010）→Cmaj7（放開食指）→C7（小指按第三弦 3 格），一分鐘聽完三種七度色彩。",
+            chords: ["C", "Cmaj7", "C7"],
           },
           {
             level: "挑戰",
@@ -112,6 +116,8 @@ export function ChordLibraryPage() {
               "捲到頁面下方的「和弦變化教室」，切到「同把位對照」模式——13 種和弦停在同一把位，只有變動的音（琥珀色點）會移動。",
             guitar:
               "用 A 型手型在第 3 格連續按 C→Cm→C7→Cmaj7，親手感受每個變化其實只差一根手指。",
+            chords: ["C", "Cm", "C7", "Cmaj7"],
+            movable: true,
           },
         ]}
         notes={[

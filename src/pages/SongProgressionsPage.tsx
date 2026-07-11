@@ -269,24 +269,28 @@ export function SongProgressionsPage() {
             title: "三個和弦打天下",
             learn: "選「I–IV–V 龐克三和弦」按 ▶ 播放，看亮起的小節怎麼換和弦。",
             guitar: "跟著伴奏刷 A–D–E，全部下撥、越直越好——態度比技巧重要。",
+            chords: ["A", "D", "E"],
           },
           {
             level: "入門",
             title: "四和弦金曲",
             learn: "選「I–V–vi–IV 四和弦金曲」：I 是家、V 帶動力、vi 轉憂鬱、IV 推回家。",
             guitar: "用 8 Beat 跟刷 C–G–Am–F 一輪；再選「vi–IV–I–V 感傷搖滾」聽同樣四個和弦換順序變憂鬱。",
+            chords: ["C", "G", "Am", "F"],
           },
           {
             level: "進階",
             title: "日系必修：王道與卡農",
             learn: "選「王道進行」（IVM7 起手的懸浮感）與「卡農進行」（低音級進下行），讀說明裡的級數分析。",
             guitar: "跟刷 Fmaj7–G7–Em7–Am7；卡農進行跟著低音 C–B–A–G 的下行聽開闊感。",
+            chords: ["Fmaj7", "G7", "Em7", "Am7"],
           },
           {
             level: "進階",
             title: "移調與色彩實驗",
             learn: "用「Key」把熟了的進行移到 G、D 調；用「色彩」切七和弦版／add9 版聽色差。",
             guitar: "把四和弦金曲移到 G 調刷一輪（G–D–Em–C）——級數沒變，手型全變，這就是移調。",
+            chords: ["G", "D", "Em", "C"],
           },
           {
             level: "挑戰",
@@ -295,6 +299,7 @@ export function SongProgressionsPage() {
               "選「12 小節藍調」（全屬七）、「IVm 借用（催淚彈）」與「副屬和弦鏈」，讀它們借了哪裡的和弦。",
             guitar:
               "E7–A7–B7 跟完 12 小節；再彈 C–F–Fm–C 聽 Fm 那半音的催淚效果；最後配著 solo 建議的音階即興幾句。",
+            chords: ["E7", "A7", "B7", "F", "Fm"],
           },
         ]}
         notes={[

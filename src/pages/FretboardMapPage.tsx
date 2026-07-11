@@ -99,6 +99,7 @@ export function FretboardMapPage() {
               "看第三段：切到 G7，找出 3 音 B 和 ♭7 音 F 在指板上的位置——它們決定和弦的身分。",
             guitar:
               "循環刷 G7→C，單音彈 B→C（3→1）再彈 F→E（♭7→3），親耳聽兩條半音線同時解決的拉力。",
+            chords: ["G7", "C"],
           },
         ]}
         notes={[

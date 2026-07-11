@@ -69,6 +69,7 @@ export function CircleOfFifthsPage() {
             learn:
               "點頂端的 C 再點隔壁的 G：調號只差一個 ♯、調內音只差一個——五度圈上越近的調血緣越近。",
             guitar: "彈 C 和弦再彈 G 和弦，來回幾次——耳朵會覺得它們「很合」，這就是五度關係。",
+            chords: ["C", "G"],
           },
           {
             level: "進階",
@@ -77,6 +78,7 @@ export function CircleOfFifthsPage() {
               "任選一個調：V 就在順時針隔壁、IV 在逆時針隔壁——用「近親調」按鈕確認。",
             guitar:
               "用圈找出 G 大調的 IV（C）和 V（D），彈 G–C–D–G——不用數音，看圖就能組出任何調的三大和弦。",
+            chords: ["G", "C", "D"],
           },
           {
             level: "進階",
@@ -92,6 +94,7 @@ export function CircleOfFifthsPage() {
               "II–V–I 和副屬和弦鏈都是沿逆時針走——每個和弦都是下一個的 V，一路被推回家。",
             guitar:
               "彈 Dm7–G7–Cmaj7，再整組逆時針搬一格變 Gm7–C7–Fmaj7——爵士就是坐這條傳送帶環遊 12 個調。",
+            chords: ["Dm7", "G7", "Cmaj7", "Gm7", "C7", "Fmaj7"],
           },
         ]}
         notes={[

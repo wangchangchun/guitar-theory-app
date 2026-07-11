@@ -223,3 +223,11 @@ export function findMovableAShape(
   const form = forms.find((f) => f.rootString === 5) ?? forms[0];
   return buildFromForm(form, root, quality, formBase(form, noteToPc(root)));
 }
+
+/** 依和弦名稱取 A 型可移動手型（同把位對照、學習清單內嵌圖用） */
+export function findMovableShapeForName(chordName: string): ChordShape {
+  const root = parseRoot(chordName);
+  const quality = SUFFIX_TO_QUALITY[chordName.slice(root.length)];
+  if (!quality) throw new Error(`無法解析和弦名稱：${chordName}`);
+  return findMovableAShape(root, quality);
+}

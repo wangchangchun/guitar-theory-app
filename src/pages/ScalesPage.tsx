@@ -122,6 +122,7 @@ export function ScalesPage() {
             learn: "切和聲小調：自然小調把 ♭7 升回 7，就為了讓 V7→Im 有回家的力量。",
             guitar:
               "彈 Am–E7–Am 循環，在 E7 那小節把所有 G 換成 G#——聽「回家」的力量瞬間變強。",
+            chords: ["Am", "E7"],
           },
         ]}
         notes={[
