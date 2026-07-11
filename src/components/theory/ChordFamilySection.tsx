@@ -1,10 +1,13 @@
 import { useState } from "react";
-import type { ChordQuality } from "../../types/music";
-import { QUALITY_LABELS } from "../../types/music";
+import type { ChordQuality, ChordShape } from "../../types/music";
+import { QUALITY_LABELS, STANDARD_TUNING_MIDI } from "../../types/music";
+import type { ChordFormula } from "../../data/theory";
 import {
   CHORD_FORMULAS,
+  degreeLabel,
   intervalOf,
   noteToPc,
+  pcToName,
   spellChordTones,
 } from "../../data/theory";
 import { findChordShape, findMovableAShape } from "../../data/chordLookup";
@@ -13,6 +16,67 @@ import { ChordDiagram } from "../fretboard/ChordDiagram";
 
 /** 大三和弦的音程集合，用來標記「哪個音被動過了」 */
 const MAJOR_INTERVALS = new Set([0, 4, 7]);
+
+const STRING_NAMES = ["六", "五", "四", "三", "二", "一"];
+
+/** 手型的落點：最低按壓格（全空弦時為 0） */
+function anchorFret(shape: ChordShape): number {
+  const fretted = shape.frets.filter(
+    (f): f is number => typeof f === "number" && f > 0,
+  );
+  return fretted.length ? Math.min(...fretted) : 0;
+}
+
+/**
+ * 實用按法跟大三和弦不在同一把位時，說明「為什麼跳走」的逐列邏輯：
+ * 分析大三和弦開放型的空弦音，找出目標和弦裡必須改變、卻壓不下去的那條弦。
+ * 沒換把位回傳 null。
+ */
+function positionJumpNote(
+  root: string,
+  rootPc: number,
+  majorShape: ChordShape,
+  shape: ChordShape,
+  f: ChordFormula,
+): string | null {
+  if (f.quality === "major") return null;
+  const jumped =
+    Math.abs(anchorFret(shape) - anchorFret(majorShape)) >= 2 ||
+    (majorShape.positionType === "open" && shape.positionType !== "open");
+  if (!jumped) return null;
+
+  const pos = shape.barre
+    ? `第 ${shape.barre.fret} 格`
+    : `第 ${anchorFret(shape)} 格`;
+
+  if (f.quality === "power") {
+    return `強力和弦慣用「低音弦根音＋五度」的可移動型（整條指板都能搬），所以標準按法落在${pos}——不是變化本身需要換位置。`;
+  }
+  if (majorShape.positionType !== "open") {
+    return `這個性質的可移動手型根音落點不同，所以在${pos}附近——樂理變化一樣，只是換個地方按。`;
+  }
+
+  // 大三和弦開放型的空弦音中，目標和弦不允許的那些＝卡住的原因
+  const targetSet = new Set(f.intervals.map((s) => s % 12));
+  const blockers = majorShape.frets.flatMap((fret, i) => {
+    if (fret !== 0) return [];
+    const semi =
+      (((STANDARD_TUNING_MIDI[i] - rootPc) % 12) + 12) % 12;
+    if (targetSet.has(semi)) return [];
+    return [
+      `第${STRING_NAMES[i]}弦空弦 ${pcToName(STANDARD_TUNING_MIDI[i] % 12)}（${degreeLabel(semi)} 音）`,
+    ];
+  });
+
+  if (blockers.length > 0) {
+    return (
+      `開放 ${root} 的${blockers.join("、")}在 ${root}${f.suffix} 裡必須改變，` +
+      `但空弦壓不下去——只好整個手型搬到${pos}的可移動型。` +
+      `樂理上動的音一模一樣，切「同把位對照」就能看到其實只動一兩顆點。`
+    );
+  }
+  return `${root}${f.suffix} 在開放把位沒有順手的按法，所以改用${pos}的可移動手型——樂理變化不變，位置純粹是為了好按。`;
+}
 
 /** 依難易度分層：先三和弦、再掛留與七和弦、最後色彩與功能和弦 */
 const FAMILY_TIERS: {
@@ -50,6 +114,7 @@ interface Props {
 export function ChordFamilySection({ root, currentQuality }: Props) {
   const rootPc = noteToPc(root);
   const [sameShape, setSameShape] = useState(false);
+  const majorShape = findChordShape(root, "major");
   return (
     <section className="mt-8">
       <h2 className="mb-2 text-lg font-bold text-slate-100">
@@ -143,6 +208,9 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
           const shape = sameShape
             ? findMovableAShape(root, f.quality)
             : findChordShape(root, f.quality);
+          const jumpNote = sameShape
+            ? null
+            : positionJumpNote(root, rootPc, majorShape, shape, f);
           const active = f.quality === currentQuality;
           return (
             <div
@@ -202,6 +270,14 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
                   </span>
                   {f.changeText}
                 </p>
+                {jumpNote && (
+                  <p>
+                    <span className="mr-1 font-semibold text-rose-300/90">
+                      為何換把位
+                    </span>
+                    {jumpNote}
+                  </p>
+                )}
                 <p>
                   <span className="mr-1 font-semibold text-sky-300/90">
                     什麼時候用
