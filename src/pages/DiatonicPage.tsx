@@ -43,6 +43,7 @@ export function DiatonicPage() {
               "用預設的 C 大調，從 I 到 VII 逐列點三和弦試聽——順階和弦就是這個調「自己人」的全部名單。",
             guitar:
               "彈順階爬梯 C–Dm–Em–F–G–Am–Bdim–C，邊彈邊唸「一、二m、三m、四、五、六m、七減」。",
+            chords: ["C", "Dm", "Em", "F", "G", "Am", "Bdim"],
           },
           {
             level: "進階",
@@ -51,6 +52,7 @@ export function DiatonicPage() {
               "讀每列右側的角色說明：I 是家、IV 離家、V 最想回家——和弦進行就是在這三種引力間移動。",
             guitar:
               "彈 C–F–G–C（I–IV–V–I）數次，刻意在 G 停一拍感受「懸著想回家」，再落回 C。",
+            chords: ["C", "F", "G"],
           },
           {
             level: "進階",
@@ -58,6 +60,7 @@ export function DiatonicPage() {
             learn: "改點每列的七和弦：同樣的功能，多疊一個七度就多一層都會感。",
             guitar:
               "彈順階七和弦 Cmaj7–Dm7–Em7–Fmaj7–G7–Am7，跟三和弦版本比色彩。",
+            chords: ["Cmaj7", "Dm7", "Em7", "Fmaj7", "G7", "Am7"],
           },
           {
             level: "挑戰",
@@ -66,6 +69,7 @@ export function DiatonicPage() {
               "切到 G 大調：級數排列一模一樣、只是根音跟著跑；再切「自然小調」看另一張順階表。",
             guitar:
               "把 I–IV–V–I 搬到 G 大調彈（G–C–D–G）——和弦全變了、感覺完全一樣，這就是級數思考。",
+            chords: ["G", "C", "D"],
           },
         ]}
         notes={[
