@@ -114,7 +114,7 @@ export function DiatonicPage() {
       {/* 調與模式選擇 */}
       <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
         <div>
-          <h3 className="mb-2 text-sm font-semibold text-slate-300">調</h3>
+          <h3 className="mb-2 text-sm font-semibold text-ink-700">調</h3>
           <div className="flex flex-wrap gap-1.5">
             {KEY_OPTIONS.map((k) => (
               <button
@@ -122,8 +122,8 @@ export function DiatonicPage() {
                 onClick={() => setKeyName(k)}
                 className={`w-10 rounded-lg py-1.5 font-mono text-sm font-semibold transition-colors ${
                   keyName === k
-                    ? "bg-amber-500 text-slate-950"
-                    : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                    ? "bg-navy-700 text-white"
+                    : "bg-paper-300 text-ink-700 hover:bg-paper-400"
                 }`}
               >
                 {k}
@@ -132,12 +132,12 @@ export function DiatonicPage() {
           </div>
         </div>
         <div>
-          <h3 className="mb-2 text-sm font-semibold text-slate-300">調性</h3>
-          <div className="flex overflow-hidden rounded-lg border border-slate-700 text-sm">
+          <h3 className="mb-2 text-sm font-semibold text-ink-700">調性</h3>
+          <div className="flex overflow-hidden rounded-lg border border-line-200 text-sm">
             <button
               onClick={() => setMode("major")}
               className={`px-4 py-1.5 font-medium ${
-                mode === "major" ? "bg-slate-700 text-amber-300" : "text-slate-400"
+                mode === "major" ? "bg-paper-400 text-navy-700" : "text-ink-600"
               }`}
             >
               大調
@@ -145,17 +145,17 @@ export function DiatonicPage() {
             <button
               onClick={() => setMode("minor")}
               className={`px-4 py-1.5 font-medium ${
-                mode === "minor" ? "bg-slate-700 text-amber-300" : "text-slate-400"
+                mode === "minor" ? "bg-paper-400 text-navy-700" : "text-ink-600"
               }`}
             >
               自然小調
             </button>
           </div>
         </div>
-        <p className="text-xs text-slate-500">
+        <p className="text-xs text-ink-500">
           調內音：
           {scaleNotes.map((n) => (
-            <span key={n} className="ml-1 font-mono text-slate-300">
+            <span key={n} className="ml-1 font-mono text-ink-700">
               {n}
             </span>
           ))}
@@ -163,28 +163,28 @@ export function DiatonicPage() {
       </div>
 
       {/* 鋼琴輔助：隔音疊三度 */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-        <h3 className="mb-1 text-base font-bold text-slate-100">
+      <div className="rounded-2xl border border-line-200 bg-paper-100 p-5">
+        <h3 className="mb-1 text-base font-bold text-ink-900">
           🎹 「隔音疊三度」是什麼？用鋼琴看最清楚
         </h3>
-        <p className="mb-3 text-sm leading-relaxed text-slate-400">
+        <p className="mb-3 text-sm leading-relaxed text-ink-600">
           下面是 {keyName} {mode === "major" ? "大" : "小"}調的七個音（琥珀色鍵，最左邊就是主音
           {keyName}）。選一個級數：從那個音出發
-          <span className="mx-1 text-amber-300">「隔一個拿一個」</span>
+          <span className="mx-1 text-navy-700">「隔一個拿一個」</span>
           連拿四層（亮色鍵），疊出來的就是該級的順階七和弦——
-          <span className="text-amber-300">大小性質不用背</span>
+          <span className="text-navy-700">大小性質不用背</span>
           ，是音階裡全音半音的位置自己決定的。
         </p>
         <div className="mb-3 flex flex-wrap items-center gap-1.5">
-          <span className="text-xs font-semibold text-slate-400">級數：</span>
+          <span className="text-xs font-semibold text-ink-600">級數：</span>
           {degrees.map((d, i) => (
             <button
               key={d.seventhNumeral}
               onClick={() => setStackDegree(i)}
               className={`rounded-lg px-3 py-1 font-mono text-xs font-semibold transition-colors ${
                 stackDegree === i
-                  ? "bg-amber-500 text-slate-950"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  ? "bg-navy-700 text-white"
+                  : "bg-paper-300 text-ink-700 hover:bg-paper-400"
               }`}
             >
               {d.seventhNumeral}
@@ -193,26 +193,26 @@ export function DiatonicPage() {
         </div>
         <PianoKeys fromMidi={pianoBase} semitones={25} marks={pianoMarks} />
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-sm text-slate-300">
-            <span className="font-mono font-bold text-amber-300">
+          <p className="text-sm text-ink-700">
+            <span className="font-mono font-bold text-navy-700">
               {stackEntry.seventhNumeral}
             </span>{" "}
             ＝ 第 {stackDegree + 1} 個音出發隔一個拿一個 →{" "}
-            <span className="font-mono text-amber-300">
+            <span className="font-mono text-navy-700">
               {stackNoteNames.join("·")}
             </span>{" "}
-            ＝ <span className="font-bold text-slate-100">{stackChordName}</span>
+            ＝ <span className="font-bold text-ink-900">{stackChordName}</span>
           </p>
           <button
             onClick={() =>
               playMidiNotes(stackOffsets.map((o) => pianoBase + o))
             }
-            className="rounded-lg bg-amber-500 px-4 py-1.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-amber-400"
+            className="rounded-lg bg-navy-700 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-navy-600"
           >
             ♪ 聽這個和弦
           </button>
         </div>
-        <p className="mt-2 text-xs leading-relaxed text-slate-500">
+        <p className="mt-2 text-xs leading-relaxed text-ink-500">
           同一個「隔音疊三度」的動作，只因起點不同就疊出大、小、屬、半減——所以
           {mode === "major"
             ? "大調永遠是 IM7・IIm7・IIIm7・IVM7・V7・VIm7・VIIm7♭5"
@@ -222,7 +222,7 @@ export function DiatonicPage() {
       </div>
 
       {/* 順階和弦表 */}
-      <div className="divide-y divide-slate-800 rounded-xl border border-slate-800 bg-slate-900">
+      <div className="divide-y divide-line-200 rounded-xl border border-line-200 bg-paper-100">
         {degrees.map((d) => {
           const rootName = pcToName(keyPc + d.semitones, useFlats);
           const triadName = rootName + CHORD_FORMULAS[d.triadQuality].suffix;
@@ -238,17 +238,17 @@ export function DiatonicPage() {
               className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3"
             >
               <div className="w-24">
-                <p className="font-mono text-lg font-bold text-amber-400">
+                <p className="font-mono text-lg font-bold text-navy-700">
                   {d.seventhNumeral}
                 </p>
-                <p className="font-mono text-xs text-slate-500">{d.triadNumeral}</p>
+                <p className="font-mono text-xs text-ink-500">{d.triadNumeral}</p>
               </div>
 
               <button
                 onClick={() =>
                   playChord(findChordShape(rootName, d.triadQuality), "strum")
                 }
-                className="w-20 rounded-lg bg-slate-800 py-1.5 text-sm font-bold text-slate-200 transition-colors hover:bg-slate-700"
+                className="w-20 rounded-lg bg-paper-300 py-1.5 text-sm font-bold text-ink-900 transition-colors hover:bg-paper-400"
                 title="三和弦試聽"
               >
                 ♪ {triadName}
@@ -256,7 +256,7 @@ export function DiatonicPage() {
 
               <button
                 onClick={() => playChord(seventhShape, "strum")}
-                className="w-24 rounded-lg bg-slate-800 py-1.5 text-sm font-bold text-amber-300 transition-colors hover:bg-slate-700"
+                className="w-24 rounded-lg bg-paper-300 py-1.5 text-sm font-bold text-navy-700 transition-colors hover:bg-paper-400"
                 title="七和弦試聽"
               >
                 ♪ {seventhName}
@@ -264,24 +264,24 @@ export function DiatonicPage() {
 
               <button
                 onClick={() => playChord(seventhShape, "arpeggio")}
-                className="shrink-0 rounded-lg transition-colors hover:bg-slate-800/60"
+                className="shrink-0 rounded-lg transition-colors hover:bg-paper-300/60"
                 title={`${seventhName} 按法，點擊分解試聽`}
               >
                 <ChordDiagram shape={seventhShape} width={84} />
               </button>
 
               <div className="min-w-48 flex-1">
-                <p className="mb-0.5 font-mono text-xs text-slate-400">
+                <p className="mb-0.5 font-mono text-xs text-ink-600">
                   {seventhTones.join(" · ")}
                 </p>
-                <p className="text-xs leading-relaxed text-slate-400">{d.role}</p>
+                <p className="text-xs leading-relaxed text-ink-600">{d.role}</p>
               </div>
             </div>
           );
         })}
       </div>
 
-      <p className="text-xs leading-relaxed text-slate-500">
+      <p className="text-xs leading-relaxed text-ink-500">
         練習：把這張表在 24 個大小調各過一遍（教材練習
         1-1）——大調的順階七和弦永遠是
         <span className="mx-1 font-mono">

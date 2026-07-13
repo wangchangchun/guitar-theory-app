@@ -86,24 +86,24 @@ export function PracticePage() {
   if (!unit) {
     return (
       <div className="mx-auto max-w-4xl">
-        <div className="mb-5 rounded-2xl border border-slate-800 bg-slate-900 p-5">
-          <p className="text-sm leading-relaxed text-slate-300">
+        <div className="mb-5 rounded-2xl border border-line-200 bg-paper-100 p-5">
+          <p className="text-sm leading-relaxed text-ink-700">
             練習分成{" "}
-            <span className="font-bold text-amber-400">
+            <span className="font-bold text-navy-700">
               {PRACTICE_UNITS.length} 個單元
             </span>
             ，每個單元只驗收一個觀念。單輪答對率達
-            <span className="mx-1 font-bold text-emerald-400">80%</span>
+            <span className="mx-1 font-bold text-olive-700">80%</span>
             即標記為精通 ✓；全部精通後解鎖
-            <span className="mx-1 font-bold text-amber-400">綜合測驗</span>
+            <span className="mx-1 font-bold text-navy-700">綜合測驗</span>
             ——確保每個觀念都被確實學到，而不是靠混合題矇混過關。
           </p>
-          <p className="mt-2 text-xs text-slate-500">
+          <p className="mt-2 text-xs text-ink-500">
             進度：{masteredCount} / {PRACTICE_UNITS.length} 個單元已精通
           </p>
-          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-slate-800">
+          <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-paper-300">
             <div
-              className="h-full bg-emerald-500 transition-all"
+              className="h-full bg-olive-700 transition-all"
               style={{
                 width: `${(masteredCount / PRACTICE_UNITS.length) * 100}%`,
               }}
@@ -122,10 +122,10 @@ export function PracticePage() {
             return (
               <div key={group.title}>
                 <div className="mb-2 flex items-baseline justify-between gap-3">
-                  <h3 className="text-sm font-bold text-slate-300">
+                  <h3 className="text-sm font-bold text-ink-700">
                     {group.title}
                   </h3>
-                  <span className="font-mono text-xs text-slate-500">
+                  <span className="font-mono text-xs text-ink-500">
                     {groupMastered}/{units.length} 精通
                   </span>
                 </div>
@@ -140,46 +140,46 @@ export function PracticePage() {
                         onClick={() => startUnit(u)}
                         className={`rounded-xl border p-4 text-left transition-colors ${
                           mastered
-                            ? "border-emerald-600/60 bg-emerald-950/30 hover:border-emerald-500"
-                            : "border-slate-800 bg-slate-900 hover:border-slate-600"
+                            ? "border-olive-700/60 bg-olive-700/30 hover:border-olive-700"
+                            : "border-line-200 bg-paper-100 hover:border-line-300"
                         }`}
                       >
                         <div className="mb-1 flex items-center justify-between gap-2">
-                          <span className="font-bold text-slate-100">
+                          <span className="font-bold text-ink-900">
                             {u.emoji} 單元 {no}｜{u.title}
                           </span>
                           {mastered ? (
-                            <span className="shrink-0 rounded-full bg-emerald-600/30 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                            <span className="shrink-0 rounded-full bg-olive-700/30 px-2 py-0.5 text-[10px] font-semibold text-olive-700">
                               ✓ 已精通
                             </span>
                           ) : p ? (
-                            <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">
+                            <span className="shrink-0 rounded-full bg-paper-300 px-2 py-0.5 text-[10px] text-ink-600">
                               練習中
                             </span>
                           ) : (
-                            <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-500">
+                            <span className="shrink-0 rounded-full bg-paper-300 px-2 py-0.5 text-[10px] text-ink-500">
                               未挑戰
                             </span>
                           )}
                         </div>
-                        <p className="mb-2 text-xs leading-relaxed text-slate-400">
+                        <p className="mb-2 text-xs leading-relaxed text-ink-600">
                           {u.tagline}
                         </p>
                         <ul className="mb-2 space-y-0.5">
                           {u.goals.map((g) => (
                             <li
                               key={g}
-                              className="text-[11px] leading-relaxed text-slate-500"
+                              className="text-[11px] leading-relaxed text-ink-500"
                             >
                               ・{g}
                             </li>
                           ))}
                         </ul>
-                        <p className="mb-1 text-[11px] text-amber-300/70">
+                        <p className="mb-1 text-[11px] text-navy-700/70">
                           🎸 附 {u.drills.length} 個上琴應用練習
                         </p>
                         {p && (
-                          <p className="text-[11px] font-mono text-slate-500">
+                          <p className="text-[11px] font-mono text-ink-500">
                             最佳成績 {p.best}/{p.total}・已挑戰 {p.attempts} 輪
                           </p>
                         )}
@@ -197,27 +197,27 @@ export function PracticePage() {
             disabled={!finalUnlocked}
             className={`rounded-xl border p-4 text-left transition-colors sm:col-span-2 ${
               finalUnlocked
-                ? "border-amber-500/70 bg-amber-500/10 hover:border-amber-400"
-                : "cursor-not-allowed border-slate-800 bg-slate-900/50"
+                ? "border-navy-700/70 bg-navy-700/10 hover:border-navy-700"
+                : "cursor-not-allowed border-line-200 bg-paper-100/50"
             }`}
           >
             <div className="mb-1 flex items-center justify-between gap-2">
               <span
                 className={`font-bold ${
-                  finalUnlocked ? "text-amber-300" : "text-slate-500"
+                  finalUnlocked ? "text-navy-700" : "text-ink-500"
                 }`}
               >
                 {finalUnlocked ? "🏆" : "🔒"} {FINAL_UNIT.title}
               </span>
               {isMastered(progress[FINAL_UNIT.id]) && (
-                <span className="shrink-0 rounded-full bg-emerald-600/30 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                <span className="shrink-0 rounded-full bg-olive-700/30 px-2 py-0.5 text-[10px] font-semibold text-olive-700">
                   ✓ 已通關
                 </span>
               )}
             </div>
             <p
               className={`text-xs leading-relaxed ${
-                finalUnlocked ? "text-slate-300" : "text-slate-600"
+                finalUnlocked ? "text-ink-700" : "text-ink-500"
               }`}
             >
               {finalUnlocked
@@ -225,7 +225,7 @@ export function PracticePage() {
                 : `再精通 ${PRACTICE_UNITS.length - masteredCount} 個單元即可解鎖——每個觀念都確實學到，綜合測驗才有意義。`}
             </p>
             {progress[FINAL_UNIT.id] && finalUnlocked && (
-              <p className="mt-2 text-[11px] font-mono text-slate-500">
+              <p className="mt-2 text-[11px] font-mono text-ink-500">
                 最佳成績 {progress[FINAL_UNIT.id].best}/
                 {progress[FINAL_UNIT.id].total}
               </p>
@@ -259,35 +259,35 @@ export function PracticePage() {
   if (done) {
     const mastered = score / questions.length >= MASTERY_RATIO;
     return (
-      <div className="mx-auto max-w-xl rounded-2xl border border-slate-800 bg-slate-900 p-10 text-center">
-        <p className="mb-2 text-sm text-slate-400">
+      <div className="mx-auto max-w-xl rounded-2xl border border-line-200 bg-paper-100 p-10 text-center">
+        <p className="mb-2 text-sm text-ink-600">
           {unit.emoji} {unit.title}・本輪成績
         </p>
-        <p className="mb-2 text-5xl font-extrabold text-amber-400">
+        <p className="mb-2 text-5xl font-extrabold text-navy-700">
           {score}{" "}
-          <span className="text-2xl text-slate-500">/ {questions.length}</span>
+          <span className="text-2xl text-ink-500">/ {questions.length}</span>
         </p>
         {mastered && (
-          <p className="mb-2 text-sm font-semibold text-emerald-400">
+          <p className="mb-2 text-sm font-semibold text-olive-700">
             ✓ 達到精通標準（{Math.round(MASTERY_RATIO * 100)}%）
           </p>
         )}
-        <p className="mb-6 text-slate-300">
+        <p className="mb-6 text-ink-700">
           {resultMessage(unit, score, questions.length)}
         </p>
 
         {unit.drills.length > 0 && (
-          <div className="mb-8 rounded-xl bg-slate-800/60 p-4 text-left">
-            <p className="mb-3 text-sm font-bold text-amber-300">
+          <div className="mb-8 rounded-xl bg-paper-300/60 p-4 text-left">
+            <p className="mb-3 text-sm font-bold text-navy-700">
               🎸 上琴應用：把這個觀念搬到指板上
             </p>
             <ol className="space-y-3">
               {unit.drills.map((d, i) => (
                 <li key={d.title} className="text-sm">
-                  <span className="font-semibold text-slate-100">
+                  <span className="font-semibold text-ink-900">
                     {i + 1}. {d.title}
                   </span>
-                  <p className="mt-0.5 text-xs leading-relaxed text-slate-400">
+                  <p className="mt-0.5 text-xs leading-relaxed text-ink-600">
                     {d.how}
                   </p>
                   {d.chords && <ChordStrip chords={d.chords} width={62} />}
@@ -300,13 +300,13 @@ export function PracticePage() {
         <div className="flex justify-center gap-3">
           <button
             onClick={() => startUnit(unit)}
-            className="rounded-lg bg-amber-500 px-6 py-2.5 font-semibold text-slate-950 transition-colors hover:bg-amber-400"
+            className="rounded-lg bg-navy-700 px-6 py-2.5 font-semibold text-white transition-colors hover:bg-navy-600"
           >
             再練一輪
           </button>
           <button
             onClick={backToMenu}
-            className="rounded-lg bg-slate-700 px-6 py-2.5 font-semibold text-slate-100 transition-colors hover:bg-slate-600"
+            className="rounded-lg bg-paper-400 px-6 py-2.5 font-semibold text-ink-900 transition-colors hover:bg-paper-400"
           >
             回單元列表
           </button>
@@ -318,45 +318,45 @@ export function PracticePage() {
   return (
     <div className="mx-auto max-w-2xl">
       {/* 單元標題與進度列 */}
-      <div className="mb-2 flex items-baseline justify-between text-sm text-slate-400">
+      <div className="mb-2 flex items-baseline justify-between text-sm text-ink-600">
         <button
           onClick={backToMenu}
-          className="text-slate-400 transition-colors hover:text-amber-300"
+          className="text-ink-600 transition-colors hover:text-navy-700"
         >
           ← 單元列表
         </button>
-        <span className="font-semibold text-slate-300">
+        <span className="font-semibold text-ink-700">
           {unit.emoji} {unit.title}
         </span>
         <span>
           第 {index + 1} / {questions.length} 題・得分{" "}
-          <span className="font-bold text-amber-400">{score}</span>
+          <span className="font-bold text-navy-700">{score}</span>
         </span>
       </div>
-      <div className="mb-6 h-1.5 overflow-hidden rounded-full bg-slate-800">
+      <div className="mb-6 h-1.5 overflow-hidden rounded-full bg-paper-300">
         <div
-          className="h-full bg-amber-500 transition-all"
+          className="h-full bg-navy-700 transition-all"
           style={{
             width: `${((index + (answered ? 1 : 0)) / questions.length) * 100}%`,
           }}
         />
       </div>
 
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-        <h2 className="mb-5 text-lg font-bold leading-relaxed text-slate-100">
+      <div className="rounded-2xl border border-line-200 bg-paper-100 p-6">
+        <h2 className="mb-5 text-lg font-bold leading-relaxed text-ink-900">
           {q.prompt}
         </h2>
 
         <div className="grid gap-2 sm:grid-cols-2">
           {q.options.map((opt, i) => {
-            let style = "bg-slate-800 text-slate-200 hover:bg-slate-700";
+            let style = "bg-paper-300 text-ink-900 hover:bg-paper-400";
             if (answered) {
               if (i === q.answerIndex) {
-                style = "bg-emerald-600/80 text-white ring-1 ring-emerald-400";
+                style = "bg-olive-700/80 text-white ring-1 ring-olive-700";
               } else if (i === chosen) {
-                style = "bg-rose-600/80 text-white ring-1 ring-rose-400";
+                style = "bg-blood-700/80 text-white ring-1 ring-blood-700";
               } else {
-                style = "bg-slate-800/50 text-slate-500";
+                style = "bg-paper-300/50 text-ink-500";
               }
             }
             return (
@@ -373,22 +373,22 @@ export function PracticePage() {
         </div>
 
         {answered && (
-          <div className="mt-5 rounded-lg bg-slate-800/60 p-4">
+          <div className="mt-5 rounded-lg bg-paper-300/60 p-4">
             <p className="mb-1 font-semibold">
               {chosen === q.answerIndex ? (
-                <span className="text-emerald-400">✅ 答對了！</span>
+                <span className="text-olive-700">✅ 答對了！</span>
               ) : (
-                <span className="text-rose-400">
+                <span className="text-blood-700">
                   ❌ 正確答案是 {q.options[q.answerIndex]}
                 </span>
               )}
             </p>
-            <p className="text-sm leading-relaxed text-slate-300">{q.explanation}</p>
+            <p className="text-sm leading-relaxed text-ink-700">{q.explanation}</p>
             <div className="mt-3 flex items-center justify-between gap-3">
               {q.soundMidis ? (
                 <button
                   onClick={() => playMidiNotes(q.soundMidis!, q.soundStyle)}
-                  className="rounded-lg bg-slate-700 px-4 py-1.5 text-sm font-medium text-slate-100 transition-colors hover:bg-slate-600"
+                  className="rounded-lg bg-paper-400 px-4 py-1.5 text-sm font-medium text-ink-900 transition-colors hover:bg-paper-400"
                 >
                   ♪ 聽聽 {q.soundLabel}
                 </button>
@@ -397,7 +397,7 @@ export function PracticePage() {
               )}
               <button
                 onClick={next}
-                className="rounded-lg bg-amber-500 px-6 py-1.5 font-semibold text-slate-950 transition-colors hover:bg-amber-400"
+                className="rounded-lg bg-navy-700 px-6 py-1.5 font-semibold text-white transition-colors hover:bg-navy-600"
               >
                 {isLast ? "看成績" : "下一題 →"}
               </button>
@@ -407,17 +407,17 @@ export function PracticePage() {
       </div>
 
       {unit.drills.length > 0 && (
-        <details className="mt-4 rounded-xl border border-slate-800 bg-slate-900 px-4 py-3">
-          <summary className="cursor-pointer text-sm font-semibold text-amber-300">
+        <details className="mt-4 rounded-xl border border-line-200 bg-paper-100 px-4 py-3">
+          <summary className="cursor-pointer text-sm font-semibold text-navy-700">
             🎸 上琴應用練習（{unit.drills.length} 個）——答完題拿起吉他做
           </summary>
           <ol className="mt-3 space-y-3">
             {unit.drills.map((d, i) => (
               <li key={d.title} className="text-sm">
-                <span className="font-semibold text-slate-100">
+                <span className="font-semibold text-ink-900">
                   {i + 1}. {d.title}
                 </span>
-                <p className="mt-0.5 text-xs leading-relaxed text-slate-400">
+                <p className="mt-0.5 text-xs leading-relaxed text-ink-600">
                   {d.how}
                 </p>
                 {d.chords && <ChordStrip chords={d.chords} width={62} />}
@@ -427,7 +427,7 @@ export function PracticePage() {
         </details>
       )}
 
-      <p className="mt-4 text-center text-xs text-slate-500">{unit.tagline}</p>
+      <p className="mt-4 text-center text-xs text-ink-500">{unit.tagline}</p>
     </div>
   );
 }

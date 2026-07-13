@@ -75,9 +75,9 @@ export function ChordDiagram({
     >
       {/* 琴枕或起始格數標示 */}
       {baseFret === 1 ? (
-        <rect x={left - 1.5} y={top - 5} width={gridWidth + 3} height={5} rx={2} fill="#e2e8f0" />
+        <rect x={left - 1.5} y={top - 5} width={gridWidth + 3} height={5} rx={2} fill="#231b10" />
       ) : (
-        <text x={left - 10} y={top + fretGap * 0.5 + 4} fontSize={12} fill="#94a3b8" textAnchor="end">
+        <text x={left - 10} y={top + fretGap * 0.5 + 4} fontSize={12} fill="#5a4c30" textAnchor="end">
           {baseFret}fr
         </text>
       )}
@@ -90,7 +90,7 @@ export function ChordDiagram({
           x2={left + gridWidth}
           y1={top + i * fretGap}
           y2={top + i * fretGap}
-          stroke="#475569"
+          stroke="#765f40"
           strokeWidth={1}
         />
       ))}
@@ -103,7 +103,7 @@ export function ChordDiagram({
           x2={stringX(i)}
           y1={top}
           y2={top + gridHeight}
-          stroke="#94a3b8"
+          stroke="#5a4c30"
           strokeWidth={1.8 - i * 0.18}
         />
       ))}
@@ -114,7 +114,7 @@ export function ChordDiagram({
         const y = top - 14;
         if (fret === "x") {
           return (
-            <text key={`mark-${i}`} x={x} y={y} fontSize={13} fill="#f87171" textAnchor="middle" fontWeight={700}>
+            <text key={`mark-${i}`} x={x} y={y} fontSize={13} fill="#922b18" textAnchor="middle" fontWeight={700}>
               ×
             </text>
           );
@@ -122,8 +122,8 @@ export function ChordDiagram({
         if (fret === 0) {
           if (showDegrees) {
             const info = noteInfo(i, 0);
-            const fill = info.isChanged ? "#f59e0b" : "#1e293b";
-            const textFill = info.isChanged ? "#1c1204" : info.isRoot ? "#fbbf24" : "#cbd5e1";
+            const fill = info.isChanged ? "#1a3a6b" : "#e6d0a8";
+            const textFill = info.isChanged ? "#ffffff" : info.isRoot ? "#684b13" : "#231b10";
             return (
               <g key={`mark-${i}`}>
                 <circle
@@ -131,7 +131,7 @@ export function ChordDiagram({
                   cy={y - 3}
                   r={8}
                   fill={fill}
-                  stroke={info.isRoot ? "#f59e0b" : "#475569"}
+                  stroke={info.isRoot ? "#684b13" : "#ab873f"}
                   strokeWidth={info.isRoot ? 2 : 1}
                 />
                 <text x={x} y={y} fontSize={9} fill={textFill} textAnchor="middle" fontWeight={700}>
@@ -141,7 +141,7 @@ export function ChordDiagram({
             );
           }
           return (
-            <circle key={`mark-${i}`} cx={x} cy={y - 4} r={4.5} fill="none" stroke="#e2e8f0" strokeWidth={1.5} />
+            <circle key={`mark-${i}`} cx={x} cy={y - 4} r={4.5} fill="none" stroke="#483721" strokeWidth={1.5} />
           );
         }
         return null;
@@ -159,12 +159,12 @@ export function ChordDiagram({
           }
           height={dotRadius * 2}
           rx={dotRadius}
-          fill="#f59e0b"
+          fill="#1a3a6b"
           opacity={0.45}
         />
       )}
 
-      {/* 按壓點：預設標手指編號；級數模式改標級數（根音加圈、變化音琥珀色） */}
+      {/* 按壓點：預設標手指編號；級數模式改標級數（根音加圈、變化音靛藍） */}
       {shape.frets.map((fret, i) => {
         if (typeof fret !== "number" || fret === 0) return null;
         const x = stringX(i);
@@ -172,8 +172,8 @@ export function ChordDiagram({
 
         if (showDegrees) {
           const info = noteInfo(i, fret);
-          const fill = info.isChanged ? "#f59e0b" : "#334155";
-          const textFill = info.isChanged ? "#1c1204" : info.isRoot ? "#fbbf24" : "#e2e8f0";
+          const fill = info.isChanged ? "#1a3a6b" : "#e6d0a8";
+          const textFill = info.isChanged ? "#ffffff" : info.isRoot ? "#684b13" : "#231b10";
           return (
             <g key={`dot-${i}`}>
               <circle
@@ -181,7 +181,7 @@ export function ChordDiagram({
                 cy={y}
                 r={dotRadius}
                 fill={fill}
-                stroke={info.isRoot ? "#f59e0b" : "none"}
+                stroke={info.isRoot ? "#684b13" : "none"}
                 strokeWidth={info.isRoot ? 2.5 : 0}
               />
               <text x={x} y={y + 3.5} fontSize={9} fill={textFill} textAnchor="middle" fontWeight={700}>
@@ -194,9 +194,9 @@ export function ChordDiagram({
         const finger = shape.fingers[i];
         return (
           <g key={`dot-${i}`}>
-            <circle cx={x} cy={y} r={dotRadius} fill="#f59e0b" />
+            <circle cx={x} cy={y} r={dotRadius} fill="#1a3a6b" />
             {finger != null && (
-              <text x={x} y={y + 4} fontSize={11} fill="#1c1204" textAnchor="middle" fontWeight={700}>
+              <text x={x} y={y + 4} fontSize={11} fill="#ffffff" textAnchor="middle" fontWeight={700}>
                 {finger}
               </text>
             )}

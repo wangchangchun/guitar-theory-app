@@ -107,14 +107,14 @@ export function CircleOfFifthsPage() {
 
       <div className="flex flex-col gap-6 lg:flex-row">
         {/* 圓盤 */}
-        <div className="flex flex-1 items-start justify-center rounded-2xl border border-slate-800 bg-slate-900 p-4">
+        <div className="flex flex-1 items-start justify-center rounded-2xl border border-line-200 bg-paper-100 p-4">
           <svg viewBox="0 0 420 420" className="w-full max-w-[460px]">
-            <circle cx={CX} cy={CY} r={R_OUTER} fill="none" stroke="#334155" strokeDasharray="3 5" />
-            <circle cx={CX} cy={CY} r={R_INNER} fill="none" stroke="#334155" strokeDasharray="3 5" />
-            <text x={CX} y={CY - 8} textAnchor="middle" fontSize="11" fill="#64748b">
+            <circle cx={CX} cy={CY} r={R_OUTER} fill="none" stroke="#c9b48a" strokeDasharray="3 5" />
+            <circle cx={CX} cy={CY} r={R_INNER} fill="none" stroke="#c9b48a" strokeDasharray="3 5" />
+            <text x={CX} y={CY - 8} textAnchor="middle" fontSize="11" fill="#5a4c30">
               外圈＝大調
             </text>
-            <text x={CX} y={CY + 10} textAnchor="middle" fontSize="11" fill="#64748b">
+            <text x={CX} y={CY + 10} textAnchor="middle" fontSize="11" fill="#5a4c30">
               內圈＝關係小調
             </text>
 
@@ -136,8 +136,8 @@ export function CircleOfFifthsPage() {
                       cx={outer.x}
                       cy={outer.y}
                       r={26}
-                      fill={isSelected ? "#f59e0b" : isNeighbor ? "#78350f" : "#1e293b"}
-                      stroke={isSelected || isNeighbor ? "#f59e0b" : "#475569"}
+                      fill={isSelected ? "#1a3a6b" : isNeighbor ? "#684b13" : "#ecdfc4"}
+                      stroke={isSelected ? "#1a3a6b" : isNeighbor ? "#684b13" : "#ab873f"}
                       strokeWidth={isSelected ? 2 : 1}
                     />
                     <text
@@ -146,7 +146,7 @@ export function CircleOfFifthsPage() {
                       textAnchor="middle"
                       fontSize="15"
                       fontWeight="bold"
-                      fill={isSelected ? "#0f172a" : "#f1f5f9"}
+                      fill={isSelected || isNeighbor ? "#ffffff" : "#231b10"}
                     >
                       {key.major}
                     </text>
@@ -155,7 +155,7 @@ export function CircleOfFifthsPage() {
                       y={outer.y + 14}
                       textAnchor="middle"
                       fontSize="8"
-                      fill={isSelected ? "#0f172a" : "#94a3b8"}
+                      fill={isSelected || isNeighbor ? "rgba(255,255,255,0.8)" : "#5a4c30"}
                     >
                       {key.signature}
                     </text>
@@ -171,8 +171,8 @@ export function CircleOfFifthsPage() {
                       cx={inner.x}
                       cy={inner.y}
                       r={19}
-                      fill={isSelected ? "#0c4a6e" : "#0f172a"}
-                      stroke={isSelected ? "#38bdf8" : "#334155"}
+                      fill={isSelected ? "#1a3a6b" : "#e6d0a8"}
+                      stroke={isSelected ? "#684b13" : "#ab873f"}
                       strokeWidth={isSelected ? 1.5 : 1}
                     />
                     <text
@@ -181,7 +181,7 @@ export function CircleOfFifthsPage() {
                       textAnchor="middle"
                       fontSize="11"
                       fontWeight="600"
-                      fill={isSelected ? "#7dd3fc" : "#94a3b8"}
+                      fill={isSelected ? "#ffffff" : "#483721"}
                     >
                       {key.minor}
                     </text>
@@ -194,27 +194,27 @@ export function CircleOfFifthsPage() {
 
         {/* 選中調的資訊 */}
         <aside className="w-full shrink-0 lg:w-96">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+          <div className="rounded-2xl border border-line-200 bg-paper-100 p-6">
             <div className="mb-1 flex flex-wrap items-baseline gap-x-3">
-              <h2 className="text-3xl font-extrabold text-amber-400">
+              <h2 className="text-3xl font-extrabold text-navy-700">
                 {k.major} 大調
               </h2>
-              <span className="text-sm text-slate-400">
+              <span className="text-sm text-ink-600">
                 調號 {k.signature}
                 {k.enharmonic && `（${k.enharmonic}）`}
               </span>
             </div>
-            <p className="mb-4 text-sm text-slate-400">
-              關係小調：<span className="font-semibold text-sky-300">{k.minor}</span>
+            <p className="mb-4 text-sm text-ink-600">
+              關係小調：<span className="font-semibold text-gold-700">{k.minor}</span>
               （共用同一組音）
             </p>
 
-            <h3 className="mb-1 text-sm font-semibold text-slate-300">調內音</h3>
-            <p className="mb-4 font-mono text-sm text-slate-200">
+            <h3 className="mb-1 text-sm font-semibold text-ink-700">調內音</h3>
+            <p className="mb-4 font-mono text-sm text-ink-900">
               {scaleNotes.join(" · ")}
             </p>
 
-            <h3 className="mb-2 text-sm font-semibold text-slate-300">
+            <h3 className="mb-2 text-sm font-semibold text-ink-700">
               順階三和弦（點擊試聽）
             </h3>
             <div className="mb-5 flex flex-wrap gap-1.5">
@@ -227,12 +227,12 @@ export function CircleOfFifthsPage() {
                     onClick={() =>
                       playMidiNotes(theoryChordMidis(rootName, f.intervals))
                     }
-                    className="flex w-[52px] flex-col items-center rounded-md bg-slate-800 px-1 py-1.5 transition-colors hover:bg-slate-700"
+                    className="flex w-[52px] flex-col items-center rounded-md bg-paper-300 px-1 py-1.5 transition-colors hover:bg-paper-400"
                   >
-                    <span className="text-[10px] leading-none text-slate-500">
+                    <span className="text-[10px] leading-none text-ink-500">
                       {d.triadNumeral}
                     </span>
-                    <span className="mt-0.5 font-mono text-sm font-semibold text-amber-300">
+                    <span className="mt-0.5 font-mono text-sm font-semibold text-navy-700">
                       {rootName + f.suffix}
                     </span>
                   </button>
@@ -240,44 +240,44 @@ export function CircleOfFifthsPage() {
               })}
             </div>
 
-            <h3 className="mb-2 text-sm font-semibold text-slate-300">
+            <h3 className="mb-2 text-sm font-semibold text-ink-700">
               近親調（點擊跳過去）
             </h3>
             <div className="flex flex-col gap-1.5 text-sm">
               <button
                 onClick={() => selectMajor(ccwIdx)}
-                className="flex items-center justify-between rounded-lg bg-slate-800 px-3 py-2 text-left transition-colors hover:bg-slate-700"
+                className="flex items-center justify-between rounded-lg bg-paper-300 px-3 py-2 text-left transition-colors hover:bg-paper-400"
               >
-                <span className="font-semibold text-slate-100">
+                <span className="font-semibold text-ink-900">
                   ↺ {CIRCLE_KEYS[ccwIdx].major} 大調
                 </span>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-ink-600">
                   逆時針一格＝{k.major} 的 IV（下屬方向）
                 </span>
               </button>
               <button
                 onClick={() => selectMajor(cwIdx)}
-                className="flex items-center justify-between rounded-lg bg-slate-800 px-3 py-2 text-left transition-colors hover:bg-slate-700"
+                className="flex items-center justify-between rounded-lg bg-paper-300 px-3 py-2 text-left transition-colors hover:bg-paper-400"
               >
-                <span className="font-semibold text-slate-100">
+                <span className="font-semibold text-ink-900">
                   ↻ {CIRCLE_KEYS[cwIdx].major} 大調
                 </span>
-                <span className="text-xs text-slate-400">
+                <span className="text-xs text-ink-600">
                   順時針一格＝{k.major} 的 V（屬方向）
                 </span>
               </button>
               <button
                 onClick={() => selectMinor(selected)}
-                className="flex items-center justify-between rounded-lg bg-slate-800 px-3 py-2 text-left transition-colors hover:bg-slate-700"
+                className="flex items-center justify-between rounded-lg bg-paper-300 px-3 py-2 text-left transition-colors hover:bg-paper-400"
               >
-                <span className="font-semibold text-sky-300">◉ {k.minor}</span>
-                <span className="text-xs text-slate-400">
+                <span className="font-semibold text-gold-700">◉ {k.minor}</span>
+                <span className="text-xs text-ink-600">
                   同格內圈＝關係小調（同一組音）
                 </span>
               </button>
             </div>
 
-            <p className="mt-4 text-xs leading-relaxed text-slate-500">
+            <p className="mt-4 text-xs leading-relaxed text-ink-500">
               相鄰的調與 {k.major} 大調只差一個音——歌寫到一半想轉調，
               先往這三個近親調找，聽起來最順。
             </p>
@@ -286,18 +286,18 @@ export function CircleOfFifthsPage() {
       </div>
 
       {/* 鋼琴輔助：一格只差一個音 */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-        <h3 className="mb-1 text-base font-bold text-slate-100">
+      <div className="rounded-2xl border border-line-200 bg-paper-100 p-5">
+        <h3 className="mb-1 text-base font-bold text-ink-900">
           🎹 用鋼琴看「順時針一格＝只差一個音」
         </h3>
-        <p className="mb-3 text-sm leading-relaxed text-slate-400">
-          下面是 <span className="font-bold text-amber-300">{k.major} 大調</span>
+        <p className="mb-3 text-sm leading-relaxed text-ink-600">
+          下面是 <span className="font-bold text-navy-700">{k.major} 大調</span>
           的七個音（琥珀色鍵，最左邊是主音）。往順時針走到{" "}
-          <span className="font-bold text-slate-100">
+          <span className="font-bold text-ink-900">
             {CIRCLE_KEYS[cwIdx].major} 大調
           </span>
           時，只有
-          <span className="mx-1 font-mono font-bold text-cyan-300">
+          <span className="mx-1 font-mono font-bold text-gold-700">
             {pcToName(keyPc + 5, useFlats)}→{pcToName(keyPc + 6, useFlats)}
           </span>
           這一個音升高（青色鍵）——其他六個音全部共用。走一格改一個音、越走越多，
@@ -313,7 +313,7 @@ export function CircleOfFifthsPage() {
             ring: o === 0 || o === 12,
           }))}
         />
-        <p className="mt-2 text-xs leading-relaxed text-slate-500">
+        <p className="mt-2 text-xs leading-relaxed text-ink-500">
           青色鍵＝往 {CIRCLE_KEYS[cwIdx].major} 大調時要升半音的那個音（升上去正好變成新調的第
           7 音）。點任一鍵可試聽；換圓盤上的調，這張琴鍵會跟著換。
         </p>

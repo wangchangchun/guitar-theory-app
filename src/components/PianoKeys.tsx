@@ -32,14 +32,25 @@ const BW = 18; // 黑鍵寬
 const BH = 62; // 黑鍵高
 
 const WHITE_FILL: Record<PianoMark["kind"], string> = {
-  scale: "#fcd34d",
-  stack: "#f59e0b",
-  accent: "#67e8f9",
+  scale: "#e6d0a8",
+  stack: "#1a3a6b",
+  accent: "#684b13",
 };
 const BLACK_FILL: Record<PianoMark["kind"], string> = {
-  scale: "#a16207",
-  stack: "#d97706",
-  accent: "#0e7490",
+  scale: "#765f40",
+  stack: "#1a3a6b",
+  accent: "#684b13",
+};
+/** 白鍵上的標籤文字色：淺色鍵底（scale／未標記）用深墨，深色鍵底（stack／accent）用白 */
+const WHITE_TEXT: Record<PianoMark["kind"], string> = {
+  scale: "#231b10",
+  stack: "#ffffff",
+  accent: "#ffffff",
+};
+const WHITE_RING: Record<PianoMark["kind"], string> = {
+  scale: "#684b13",
+  stack: "#ffffff",
+  accent: "#ffffff",
 };
 
 export function PianoKeys({ fromMidi = 48, semitones = 25, marks = [] }: Props) {
@@ -61,7 +72,9 @@ export function PianoKeys({ fromMidi = 48, semitones = 25, marks = [] }: Props) 
       {whites.map((m) => {
         const x = xOfWhite.get(m)!;
         const mark = markMap.get(m);
-        const fill = mark ? WHITE_FILL[mark.kind] : "#e2e8f0";
+        const fill = mark ? WHITE_FILL[mark.kind] : "#f8f2e4";
+        const textFill = mark ? WHITE_TEXT[mark.kind] : "#231b10";
+        const ringStroke = mark ? WHITE_RING[mark.kind] : "#684b13";
         return (
           <g key={m} onClick={() => playNote(m)} style={{ cursor: "pointer" }}>
             <rect
@@ -71,7 +84,7 @@ export function PianoKeys({ fromMidi = 48, semitones = 25, marks = [] }: Props) 
               height={WH}
               rx={3}
               fill={fill}
-              stroke="#475569"
+              stroke="#765f40"
               strokeWidth={1}
             />
             {mark?.ring && (
@@ -80,7 +93,7 @@ export function PianoKeys({ fromMidi = 48, semitones = 25, marks = [] }: Props) 
                 cy={WH - 22}
                 r={8.5}
                 fill="none"
-                stroke="#b45309"
+                stroke={ringStroke}
                 strokeWidth={2.5}
               />
             )}
@@ -90,7 +103,7 @@ export function PianoKeys({ fromMidi = 48, semitones = 25, marks = [] }: Props) 
                 y={WH - 8}
                 fontSize={10}
                 fontWeight={700}
-                fill="#451a03"
+                fill={textFill}
                 textAnchor="middle"
               >
                 {mark.label}
@@ -108,7 +121,7 @@ export function PianoKeys({ fromMidi = 48, semitones = 25, marks = [] }: Props) 
           if (prevWhiteX === undefined) return null;
           const x = prevWhiteX + W - BW / 2 - 0.75;
           const mark = markMap.get(m);
-          const fill = mark ? BLACK_FILL[mark.kind] : "#1e293b";
+          const fill = mark ? BLACK_FILL[mark.kind] : "#231b10";
           return (
             <g key={m} onClick={() => playNote(m)} style={{ cursor: "pointer" }}>
               <rect
@@ -118,7 +131,7 @@ export function PianoKeys({ fromMidi = 48, semitones = 25, marks = [] }: Props) 
                 height={BH}
                 rx={2.5}
                 fill={fill}
-                stroke="#0f172a"
+                stroke="#000000"
                 strokeWidth={1}
               />
               {mark?.ring && (
@@ -127,7 +140,7 @@ export function PianoKeys({ fromMidi = 48, semitones = 25, marks = [] }: Props) 
                   cy={BH - 20}
                   r={6.5}
                   fill="none"
-                  stroke="#fde68a"
+                  stroke="#ffffff"
                   strokeWidth={2}
                 />
               )}
@@ -137,7 +150,7 @@ export function PianoKeys({ fromMidi = 48, semitones = 25, marks = [] }: Props) 
                   y={BH - 6}
                   fontSize={8.5}
                   fontWeight={700}
-                  fill="#f8fafc"
+                  fill="#ffffff"
                   textAnchor="middle"
                 >
                   {mark.label}

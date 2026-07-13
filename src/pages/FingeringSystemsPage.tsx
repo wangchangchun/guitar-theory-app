@@ -53,15 +53,15 @@ export function FingeringSystemsPage() {
     onPick: (i: number) => void,
   ) => (
     <div className="flex flex-wrap items-center gap-1.5">
-      <span className="text-xs font-semibold text-slate-400">把位：</span>
+      <span className="text-xs font-semibold text-ink-600">把位：</span>
       {Array.from({ length: count }, (_, i) => (
         <button
           key={i}
           onClick={() => onPick(i)}
           className={`w-9 rounded-lg py-1 text-xs font-semibold transition-colors ${
             active === i
-              ? "bg-amber-500 text-slate-950"
-              : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+              ? "bg-navy-700 text-white"
+              : "bg-paper-300 text-ink-700 hover:bg-paper-400"
           }`}
         >
           {i + 1}
@@ -118,7 +118,7 @@ export function FingeringSystemsPage() {
 
       {/* 根音選擇 */}
       <div>
-        <h3 className="mb-2 text-sm font-semibold text-slate-300">根音</h3>
+        <h3 className="mb-2 text-sm font-semibold text-ink-700">根音</h3>
         <div className="flex flex-wrap gap-1.5">
           {ROOT_OPTIONS.map((r) => (
             <button
@@ -126,8 +126,8 @@ export function FingeringSystemsPage() {
               onClick={() => setRoot(r)}
               className={`w-10 rounded-lg py-1.5 font-mono text-sm font-semibold transition-colors ${
                 root === r
-                  ? "bg-amber-500 text-slate-950"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  ? "bg-navy-700 text-white"
+                  : "bg-paper-300 text-ink-700 hover:bg-paper-400"
               }`}
             >
               {r}
@@ -137,22 +137,22 @@ export function FingeringSystemsPage() {
       </div>
 
       {/* 五聲把位 */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+      <div className="rounded-2xl border border-line-200 bg-paper-100 p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-bold">
-            🎯 五聲把位：<span className="text-amber-400">{root} {pentScale.name}</span>
-            <span className="ml-2 text-sm font-normal text-slate-400">
+            🎯 五聲把位：<span className="text-navy-700">{root} {pentScale.name}</span>
+            <span className="ml-2 text-sm font-normal text-ink-600">
               每弦 2 音 × 5 個把位
             </span>
           </h2>
           <div className="flex items-center gap-2">
-            <div className="flex overflow-hidden rounded-lg border border-slate-700 text-xs">
+            <div className="flex overflow-hidden rounded-lg border border-line-200 text-xs">
               <button
                 onClick={() => { setPentScaleId("minor-pentatonic"); setPentBox(0); }}
                 className={`px-3 py-1.5 font-medium ${
                   pentScaleId === "minor-pentatonic"
-                    ? "bg-slate-700 text-amber-300"
-                    : "text-slate-400"
+                    ? "bg-paper-400 text-navy-700"
+                    : "text-ink-600"
                 }`}
               >
                 小調五聲
@@ -161,8 +161,8 @@ export function FingeringSystemsPage() {
                 onClick={() => { setPentScaleId("major-pentatonic"); setPentBox(0); }}
                 className={`px-3 py-1.5 font-medium ${
                   pentScaleId === "major-pentatonic"
-                    ? "bg-slate-700 text-amber-300"
-                    : "text-slate-400"
+                    ? "bg-paper-400 text-navy-700"
+                    : "text-ink-600"
                 }`}
               >
                 大調五聲
@@ -170,7 +170,7 @@ export function FingeringSystemsPage() {
             </div>
             <button
               onClick={() => playPattern(pentPattern.map((n) => n.midi))}
-              className="rounded-lg bg-amber-500 px-4 py-1.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-amber-400"
+              className="rounded-lg bg-navy-700 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-navy-600"
             >
               ▶ 播放把位
             </button>
@@ -187,9 +187,9 @@ export function FingeringSystemsPage() {
           pattern={pentPattern}
           fretCount={fretCountFor(Math.max(...pentPattern.map((n) => n.fret)))}
         />
-        <p className="mt-2 text-xs leading-relaxed text-slate-500">
+        <p className="mt-2 text-xs leading-relaxed text-ink-500">
           第 {pentBox + 1} 把位從第六弦的音階第 {pentBox + 1} 個音
-          <span className="mx-1 font-mono text-amber-300">{pentStart}</span>
+          <span className="mx-1 font-mono text-navy-700">{pentStart}</span>
           出發（{root} {pentScale.name}＝{pentTones.join("·")}）。變暗的點是同一音階的其他音——
           看得出把位跟把位怎麼互相咬合。
           {pentScaleId === "minor-pentatonic" && pentBox === 0 && (
@@ -201,21 +201,21 @@ export function FingeringSystemsPage() {
       </div>
 
       {/* 一弦三音 */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+      <div className="rounded-2xl border border-line-200 bg-paper-100 p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-bold">
             ⚡ 一弦三音（3NPS）：
-            <span className="text-sky-300">{root} {npsScale.name}</span>
-            <span className="ml-2 text-sm font-normal text-slate-400">
+            <span className="text-gold-700">{root} {npsScale.name}</span>
+            <span className="ml-2 text-sm font-normal text-ink-600">
               每弦 3 音 × 7 個把位
             </span>
           </h2>
           <div className="flex items-center gap-2">
-            <div className="flex overflow-hidden rounded-lg border border-slate-700 text-xs">
+            <div className="flex overflow-hidden rounded-lg border border-line-200 text-xs">
               <button
                 onClick={() => { setNpsScaleId("major"); setNpsPos(0); }}
                 className={`px-3 py-1.5 font-medium ${
-                  npsScaleId === "major" ? "bg-slate-700 text-amber-300" : "text-slate-400"
+                  npsScaleId === "major" ? "bg-paper-400 text-navy-700" : "text-ink-600"
                 }`}
               >
                 大調
@@ -224,8 +224,8 @@ export function FingeringSystemsPage() {
                 onClick={() => { setNpsScaleId("natural-minor"); setNpsPos(0); }}
                 className={`px-3 py-1.5 font-medium ${
                   npsScaleId === "natural-minor"
-                    ? "bg-slate-700 text-amber-300"
-                    : "text-slate-400"
+                    ? "bg-paper-400 text-navy-700"
+                    : "text-ink-600"
                 }`}
               >
                 自然小調
@@ -233,7 +233,7 @@ export function FingeringSystemsPage() {
             </div>
             <button
               onClick={() => playPattern(npsPattern.map((n) => n.midi))}
-              className="rounded-lg bg-amber-500 px-4 py-1.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-amber-400"
+              className="rounded-lg bg-navy-700 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-navy-600"
             >
               ▶ 播放把位
             </button>
@@ -250,9 +250,9 @@ export function FingeringSystemsPage() {
           pattern={npsPattern}
           fretCount={fretCountFor(Math.max(...npsPattern.map((n) => n.fret)))}
         />
-        <p className="mt-2 text-xs leading-relaxed text-slate-500">
+        <p className="mt-2 text-xs leading-relaxed text-ink-500">
           第 {npsPos + 1} 把位從第六弦的音階第 {npsPos + 1} 個音
-          <span className="mx-1 font-mono text-sky-300">{npsStart}</span>
+          <span className="mx-1 font-mono text-gold-700">{npsStart}</span>
           出發（{root} {npsScale.name}＝{npsTones.join("·")}）。
           每弦固定 3 音，換弦點與撥序完全規律——交替撥弦或捶勾（legato）
           的動作在每條弦上都一樣，因此是速彈樂手的預設系統；代價是常需要跨 5–6 格的手指伸展。
@@ -260,15 +260,15 @@ export function FingeringSystemsPage() {
       </div>
 
       {/* 兩系統比較 */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-5">
-        <h3 className="mb-2 text-sm font-semibold text-slate-300">怎麼選？</h3>
-        <ul className="grid gap-x-6 gap-y-1 text-xs leading-relaxed text-slate-400 sm:grid-cols-2">
+      <div className="rounded-2xl border border-line-200 bg-paper-100 p-5">
+        <h3 className="mb-2 text-sm font-semibold text-ink-700">怎麼選？</h3>
+        <ul className="grid gap-x-6 gap-y-1 text-xs leading-relaxed text-ink-600 sm:grid-cols-2">
           <li>
-            ・<span className="text-amber-300">五聲 box</span>
+            ・<span className="text-navy-700">五聲 box</span>
             ：藍調／搖滾即興的預設。音少不出錯、推弦揉弦空間大，先把 5 個把位串起來。
           </li>
           <li>
-            ・<span className="text-sky-300">3NPS</span>
+            ・<span className="text-gold-700">3NPS</span>
             ：七聲音階（大調／小調／調式）的高速公路。跑句、模進、legato 首選。
           </li>
           <li>・兩套用的是同一組音——差別只在「每弦切幾個音」，不是不同的樂理。</li>

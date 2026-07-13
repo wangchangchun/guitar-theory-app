@@ -104,7 +104,7 @@ function colorize(chord: string, numeral: string, mode: ColorMode): string {
 const LEVEL_GROUPS: { label: string; badge: string; ids: string[] }[] = [
   {
     label: "入門｜三、四個和弦打天下",
-    badge: "text-emerald-300",
+    badge: "text-olive-700",
     ids: [
       "punk-I-IV-V",
       "axis-I-V-vi-IV",
@@ -116,7 +116,7 @@ const LEVEL_GROUPS: { label: string; badge: string; ids: string[] }[] = [
   },
   {
     label: "進階｜經典與日系必修",
-    badge: "text-amber-300",
+    badge: "text-navy-700",
     ids: [
       "jpop-canon",
       "jpop-oudou",
@@ -128,7 +128,7 @@ const LEVEL_GROUPS: { label: string; badge: string; ids: string[] }[] = [
   },
   {
     label: "挑戰｜借用・副屬・精緻和聲",
-    badge: "text-rose-300",
+    badge: "text-blood-700",
     ids: [
       "jpop-marusa",
       "jpop-subdominant-minor",
@@ -326,17 +326,17 @@ export function SongProgressionsPage() {
                   onClick={() => selectProgression(p)}
                   className={`rounded-xl border p-3 text-left transition-colors ${
                     selected.id === p.id
-                      ? "border-amber-500 bg-slate-800/80"
-                      : "border-slate-800 bg-slate-900 hover:border-slate-600"
+                      ? "border-navy-700 bg-paper-300/80"
+                      : "border-line-200 bg-paper-100 hover:border-line-300"
                   }`}
                 >
                   <div className="mb-1 flex items-center justify-between gap-2">
-                    <span className="font-bold text-slate-100">{p.title}</span>
-                    <span className="shrink-0 rounded-full bg-slate-800 px-2 py-0.5 text-[10px] text-slate-400">
+                    <span className="font-bold text-ink-900">{p.title}</span>
+                    <span className="shrink-0 rounded-full bg-paper-300 px-2 py-0.5 text-[10px] text-ink-600">
                       {GENRE_LABELS[p.genre]}
                     </span>
                   </div>
-                  <p className="font-mono text-xs text-slate-400">
+                  <p className="font-mono text-xs text-ink-600">
                     {p.steps.slice(0, 4).map((s) => s.numeral).join(" – ")}
                     {p.steps.length > 4 && " …"}
                   </p>
@@ -349,23 +349,23 @@ export function SongProgressionsPage() {
 
       {/* 右側：進行詳細 */}
       <div className="flex-1">
-        <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+        <div className="rounded-2xl border border-line-200 bg-paper-100 p-6">
           <div className="mb-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
-            <h2 className="text-2xl font-extrabold text-amber-400">
+            <h2 className="text-2xl font-extrabold text-navy-700">
               {selected.title}
             </h2>
-            <span className="text-sm text-slate-400">
+            <span className="text-sm text-ink-600">
               {keyName}
               {selected.keyQuality === "minor" ? "m" : ""} 調 · {bpm} BPM
             </span>
           </div>
-          <p className="mb-4 text-sm leading-relaxed text-slate-300">
+          <p className="mb-4 text-sm leading-relaxed text-ink-700">
             {selected.description}
           </p>
 
           {/* 移調器 */}
           <div className="mb-3">
-            <span className="mb-1.5 block text-xs font-semibold text-slate-400">
+            <span className="mb-1.5 block text-xs font-semibold text-ink-600">
               Key（移調練習：先在原調練熟，再移到別的調）
             </span>
             <div className="flex flex-wrap gap-1.5">
@@ -378,8 +378,8 @@ export function SongProgressionsPage() {
                   }}
                   className={`w-10 rounded-lg py-1 font-mono text-sm font-semibold transition-colors ${
                     keyName === k
-                      ? "bg-amber-500 text-slate-950"
-                      : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                      ? "bg-navy-700 text-white"
+                      : "bg-paper-300 text-ink-700 hover:bg-paper-400"
                   }`}
                 >
                   {k}
@@ -400,8 +400,8 @@ export function SongProgressionsPage() {
                   }}
                   className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
                     rhythm === r.id
-                      ? "bg-amber-500 text-slate-950"
-                      : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                      ? "bg-navy-700 text-white"
+                      : "bg-paper-300 text-ink-700 hover:bg-paper-400"
                   }`}
                 >
                   {r.label}
@@ -415,8 +415,8 @@ export function SongProgressionsPage() {
               }}
               className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
                 drumsOn
-                  ? "bg-slate-700 text-amber-300"
-                  : "bg-slate-800 text-slate-500"
+                  ? "bg-paper-400 text-navy-700"
+                  : "bg-paper-300 text-ink-500"
               }`}
             >
               🥁 鼓組 {drumsOn ? "開" : "關"}
@@ -428,14 +428,14 @@ export function SongProgressionsPage() {
               }}
               className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
                 modulate
-                  ? "bg-slate-700 text-amber-300"
-                  : "bg-slate-800 text-slate-500"
+                  ? "bg-paper-400 text-navy-700"
+                  : "bg-paper-300 text-ink-500"
               }`}
               title="最後副歌升 Key 的経典手法：每循環一輪全體升半音"
             >
               転調↑ {modulate ? "開" : "關"}
             </button>
-            <label className="flex items-center gap-2 text-xs text-slate-400">
+            <label className="flex items-center gap-2 text-xs text-ink-600">
               BPM
               <input
                 type="range"
@@ -448,13 +448,13 @@ export function SongProgressionsPage() {
                 }}
                 className="w-32 accent-amber-500"
               />
-              <span className="w-8 font-mono text-slate-300">{bpm}</span>
+              <span className="w-8 font-mono text-ink-700">{bpm}</span>
             </label>
           </div>
 
           {/* 色彩和弦切換（教材練習 3-1） */}
           <div className="mb-4 flex flex-wrap items-center gap-x-3 gap-y-2">
-            <span className="text-xs font-semibold text-slate-400">色彩：</span>
+            <span className="text-xs font-semibold text-ink-600">色彩：</span>
             <div className="flex gap-1.5">
               {COLOR_OPTIONS.map((c) => (
                 <button
@@ -465,15 +465,15 @@ export function SongProgressionsPage() {
                   }}
                   className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
                     colorMode === c.id
-                      ? "bg-amber-500 text-slate-950"
-                      : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                      ? "bg-navy-700 text-white"
+                      : "bg-paper-300 text-ink-700 hover:bg-paper-400"
                   }`}
                 >
                   {c.label}
                 </button>
               ))}
             </div>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-ink-500">
               把三和弦換成 M7／add9 聽顏色差：M7 都會微苦、add9 明亮現代（V 級升級成屬七）。
             </span>
           </div>
@@ -483,13 +483,13 @@ export function SongProgressionsPage() {
               onClick={isPlaying ? stop : play}
               className={`rounded-lg px-8 py-2 font-semibold transition-colors ${
                 isPlaying
-                  ? "bg-rose-500 text-white hover:bg-rose-400"
-                  : "bg-amber-500 text-slate-950 hover:bg-amber-400"
+                  ? "bg-blood-700 text-white hover:bg-rose-400"
+                  : "bg-navy-700 text-white hover:bg-navy-600"
               }`}
             >
               {isPlaying ? "⏹ 停止" : "▶ 播放"}
             </button>
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-ink-500">
               Backbeat：小鼓固定在 2、4 拍；転調開啟時每循環一輪升半音。
             </span>
           </div>
@@ -501,17 +501,17 @@ export function SongProgressionsPage() {
                 key={i}
                 className={`rounded-lg border px-3 py-2 text-center transition-colors ${
                   playingStep === i
-                    ? "border-amber-500 bg-amber-500/15"
-                    : "border-slate-800 bg-slate-950/50"
+                    ? "border-navy-700 bg-navy-700/15"
+                    : "border-line-200 bg-paper-200/50"
                 }`}
               >
-                <p className="font-mono text-[10px] text-slate-500">
+                <p className="font-mono text-[10px] text-ink-500">
                   {step.numeral}
                   {step.beats && step.beats !== 4 ? ` · ${step.beats}拍` : ""}
                 </p>
                 <p
                   className={`font-bold ${
-                    playingStep === i ? "text-amber-300" : "text-slate-200"
+                    playingStep === i ? "text-navy-700" : "text-ink-900"
                   }`}
                 >
                   {step.chord}
@@ -521,7 +521,7 @@ export function SongProgressionsPage() {
           </div>
 
           {/* 用到的和弦按法 */}
-          <h3 className="mb-2 text-sm font-semibold text-slate-300">
+          <h3 className="mb-2 text-sm font-semibold text-ink-700">
             用到的和弦（點擊試聽）
           </h3>
           <div className="mb-5 flex flex-wrap gap-3">
@@ -535,11 +535,11 @@ export function SongProgressionsPage() {
                   onClick={() => playChord(shape, "strum")}
                   className={`flex flex-col items-center rounded-xl border p-2 transition-colors ${
                     activeChord
-                      ? "border-amber-500 bg-amber-500/10"
-                      : "border-slate-800 bg-slate-950/50 hover:border-slate-600"
+                      ? "border-navy-700 bg-navy-700/10"
+                      : "border-line-200 bg-paper-200/50 hover:border-line-300"
                   }`}
                 >
-                  <span className="mb-1 text-sm font-bold text-slate-100">
+                  <span className="mb-1 text-sm font-bold text-ink-900">
                     {chord}
                   </span>
                   <ChordDiagram shape={shape} width={96} />
@@ -548,14 +548,14 @@ export function SongProgressionsPage() {
             })}
           </div>
 
-          <div className="rounded-lg bg-slate-800/60 p-4">
-            <p className="mb-1 text-sm leading-relaxed text-slate-300">
+          <div className="rounded-lg bg-paper-300/60 p-4">
+            <p className="mb-1 text-sm leading-relaxed text-ink-700">
               🎸 <span className="font-semibold">Solo 建議：</span>
               {selected.soloTip}
             </p>
             {selected.examples && (
-              <p className="text-sm leading-relaxed text-slate-400">
-                🎵 <span className="font-semibold text-slate-300">代表曲風：</span>
+              <p className="text-sm leading-relaxed text-ink-600">
+                🎵 <span className="font-semibold text-ink-700">代表曲風：</span>
                 {selected.examples}
               </p>
             )}

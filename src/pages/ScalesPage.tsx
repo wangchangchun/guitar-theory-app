@@ -13,22 +13,22 @@ const ROOT_OPTIONS = [
 const SCALE_TIERS: { label: string; badge: string; ids: string[] }[] = [
   {
     label: "入門",
-    badge: "bg-emerald-500/15 text-emerald-300",
+    badge: "bg-olive-700/15 text-olive-700",
     ids: ["minor-pentatonic", "major-pentatonic"],
   },
   {
     label: "核心",
-    badge: "bg-sky-500/15 text-sky-300",
+    badge: "bg-gold-700/15 text-gold-700",
     ids: ["major", "natural-minor"],
   },
   {
     label: "進階",
-    badge: "bg-amber-500/15 text-amber-300",
+    badge: "bg-navy-700/15 text-navy-700",
     ids: ["blues", "harmonic-minor"],
   },
   {
     label: "挑戰",
-    badge: "bg-rose-500/15 text-rose-300",
+    badge: "bg-blood-700/15 text-blood-700",
     ids: ["dorian", "mixolydian"],
   },
 ];
@@ -133,7 +133,7 @@ export function ScalesPage() {
 
       {/* 根音選擇 */}
       <div>
-        <h3 className="mb-2 text-sm font-semibold text-slate-300">根音</h3>
+        <h3 className="mb-2 text-sm font-semibold text-ink-700">根音</h3>
         <div className="flex flex-wrap gap-1.5">
           {ROOT_OPTIONS.map((r) => (
             <button
@@ -141,8 +141,8 @@ export function ScalesPage() {
               onClick={() => setRoot(r)}
               className={`w-10 rounded-lg py-1.5 font-mono text-sm font-semibold transition-colors ${
                 root === r
-                  ? "bg-amber-500 text-slate-950"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  ? "bg-navy-700 text-white"
+                  : "bg-paper-300 text-ink-700 hover:bg-paper-400"
               }`}
             >
               {r}
@@ -153,7 +153,7 @@ export function ScalesPage() {
 
       {/* 音階選擇（依難易度分組） */}
       <div>
-        <h3 className="mb-2 text-sm font-semibold text-slate-300">
+        <h3 className="mb-2 text-sm font-semibold text-ink-700">
           音階（照難易度由上往下學）
         </h3>
         <div className="flex flex-col gap-2">
@@ -172,8 +172,8 @@ export function ScalesPage() {
                     onClick={() => selectScale(s.id)}
                     className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
                       scaleId === s.id
-                        ? "bg-amber-500 text-slate-950"
-                        : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                        ? "bg-navy-700 text-white"
+                        : "bg-paper-300 text-ink-700 hover:bg-paper-400"
                     }`}
                   >
                     {s.name}
@@ -186,17 +186,17 @@ export function ScalesPage() {
       </div>
 
       {/* 指板 */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+      <div className="rounded-2xl border border-line-200 bg-paper-100 p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-bold">
-            <span className="text-amber-400">{root}</span> {scale.name}
+            <span className="text-navy-700">{root}</span> {scale.name}
           </h2>
           <div className="flex items-center gap-2">
-            <div className="flex overflow-hidden rounded-lg border border-slate-700 text-xs">
+            <div className="flex overflow-hidden rounded-lg border border-line-200 text-xs">
               <button
                 onClick={() => setShowDegrees(true)}
                 className={`px-3 py-1.5 font-medium ${
-                  showDegrees ? "bg-slate-700 text-amber-300" : "text-slate-400"
+                  showDegrees ? "bg-paper-400 text-navy-700" : "text-ink-600"
                 }`}
               >
                 級數
@@ -204,7 +204,7 @@ export function ScalesPage() {
               <button
                 onClick={() => setShowDegrees(false)}
                 className={`px-3 py-1.5 font-medium ${
-                  !showDegrees ? "bg-slate-700 text-amber-300" : "text-slate-400"
+                  !showDegrees ? "bg-paper-400 text-navy-700" : "text-ink-600"
                 }`}
               >
                 音名
@@ -212,7 +212,7 @@ export function ScalesPage() {
             </div>
             <button
               onClick={playScale}
-              className="rounded-lg bg-amber-500 px-4 py-1.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-amber-400"
+              className="rounded-lg bg-navy-700 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-navy-600"
             >
               ♪ 播放音階
             </button>
@@ -220,13 +220,13 @@ export function ScalesPage() {
         </div>
         {/* 把位選擇 */}
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold text-slate-400">把位：</span>
+          <span className="text-xs font-semibold text-ink-600">把位：</span>
           <button
             onClick={() => setPosition(null)}
             className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
               position === null
-                ? "bg-amber-500 text-slate-950"
-                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                ? "bg-navy-700 text-white"
+                : "bg-paper-300 text-ink-700 hover:bg-paper-400"
             }`}
           >
             全部
@@ -237,15 +237,15 @@ export function ScalesPage() {
               onClick={() => setPosition(i)}
               className={`w-9 rounded-lg py-1 text-xs font-semibold transition-colors ${
                 position === i
-                  ? "bg-amber-500 text-slate-950"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  ? "bg-navy-700 text-white"
+                  : "bg-paper-300 text-ink-700 hover:bg-paper-400"
               }`}
             >
               {i + 1}
             </button>
           ))}
           {activePos && fretWindow && (
-            <span className="text-xs text-slate-500">
+            <span className="text-xs text-ink-500">
               第 {position! + 1} 把位：
               {activePos.fret === 0
                 ? "開放把位（0–3 格）"
@@ -261,11 +261,11 @@ export function ScalesPage() {
           showDegrees={showDegrees}
           fretWindow={fretWindow}
         />
-        <p className="mt-2 text-xs text-slate-500">
-          <span className="text-amber-400">●</span> 根音
+        <p className="mt-2 text-xs text-ink-500">
+          <span className="text-navy-700">●</span> 根音
           {scale.degrees.includes("♭5") && (
             <>
-              　<span className="text-cyan-400">●</span> 藍調音（♭5）
+              　<span className="text-gold-700">●</span> 藍調音（♭5）
             </>
           )}
           　點任一音可試聽。把位（Box）＝把音階切成一段段好記的指型：第 1
@@ -275,19 +275,19 @@ export function ScalesPage() {
       </div>
 
       {/* 音階說明 */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
+      <div className="rounded-2xl border border-line-200 bg-paper-100 p-6">
         <div className="mb-3">
-          <h3 className="mb-2 text-sm font-semibold text-slate-300">音階組成</h3>
+          <h3 className="mb-2 text-sm font-semibold text-ink-700">音階組成</h3>
           <div className="flex flex-wrap gap-1.5">
             {scale.intervals.map((s, i) => (
               <span
                 key={s}
                 className={`flex w-11 flex-col items-center rounded-md px-1 py-1 ${
                   i === 0
-                    ? "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/50"
+                    ? "bg-navy-700/20 text-navy-700 ring-1 ring-navy-700/50"
                     : scale.degrees[i] === "♭5"
-                      ? "bg-cyan-500/20 text-cyan-300 ring-1 ring-cyan-500/50"
-                      : "bg-slate-800 text-slate-300"
+                      ? "bg-gold-700/20 text-gold-700 ring-1 ring-gold-700/50"
+                      : "bg-paper-300 text-ink-700"
                 }`}
               >
                 <span className="text-[10px] leading-none opacity-70">
@@ -298,11 +298,11 @@ export function ScalesPage() {
             ))}
           </div>
         </div>
-        <p className="mb-2 text-sm leading-relaxed text-slate-300">
+        <p className="mb-2 text-sm leading-relaxed text-ink-700">
           {scale.description}
         </p>
-        <p className="text-sm leading-relaxed text-slate-400">
-          🎸 <span className="font-semibold text-slate-300">怎麼用：</span>
+        <p className="text-sm leading-relaxed text-ink-600">
+          🎸 <span className="font-semibold text-ink-700">怎麼用：</span>
           {scale.usage}
         </p>
       </div>
