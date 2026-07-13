@@ -117,33 +117,33 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
   const majorShape = findChordShape(root, "major");
   return (
     <section className="mt-8">
-      <h2 className="mb-2 text-lg font-bold text-slate-100">
-        🎓 和弦變化教室：<span className="text-amber-400">{root} 家族</span>
+      <h2 className="mb-2 text-lg font-bold text-ink-900">
+        🎓 和弦變化教室：<span className="text-navy-700">{root} 家族</span>
       </h2>
-      <p className="mb-2 text-sm leading-relaxed text-slate-400">
+      <p className="mb-2 text-sm leading-relaxed text-ink-600">
         和弦是從根音出發、按「級數」往上疊音蓋出來的：大三和弦的公式是
-        <span className="mx-1 font-mono text-amber-300">1 · 3 · 5</span>。
+        <span className="mx-1 font-mono text-navy-700">1 · 3 · 5</span>。
         只要動其中一個音、或再疊一個音，就會變出下面這些親戚。每列都寫著
-        <span className="mx-1 text-amber-300">怎麼變化</span>（動了哪個音）與
-        <span className="mx-1 text-sky-300">什麼時候用</span>
+        <span className="mx-1 text-navy-700">怎麼變化</span>（動了哪個音）與
+        <span className="mx-1 text-gold-700">什麼時候用</span>
         （實戰時機）。點和弦名或按法圖可以試聽比較。
       </p>
-      <p className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+      <p className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-ink-500">
         <span>按法圖上的數字＝每條弦相對根音的級數：</span>
         <span className="inline-flex items-center gap-1">
-          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-700 text-[9px] font-bold text-amber-300 ring-2 ring-amber-500">
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-paper-400 text-[9px] font-bold text-navy-700 ring-2 ring-navy-700">
             1
           </span>
           加圈＝根音
         </span>
         <span className="inline-flex items-center gap-1">
-          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-amber-500 text-[9px] font-bold text-slate-950">
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-navy-700 text-[9px] font-bold text-white">
             ♭3
           </span>
           琥珀＝與大三和弦不同的音
         </span>
         <span className="inline-flex items-center gap-1">
-          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-slate-700 text-[9px] font-bold text-slate-200">
+          <span className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-paper-400 text-[9px] font-bold text-ink-900">
             5
           </span>
           灰＝沒動到的音
@@ -152,12 +152,12 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
 
       {/* 按法模式切換 */}
       <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-2">
-        <span className="text-xs font-semibold text-slate-400">按法：</span>
-        <div className="flex overflow-hidden rounded-lg border border-slate-700 text-xs">
+        <span className="text-xs font-semibold text-ink-600">按法：</span>
+        <div className="flex overflow-hidden rounded-lg border border-line-200 text-xs">
           <button
             onClick={() => setSameShape(false)}
             className={`px-3 py-1.5 font-medium ${
-              !sameShape ? "bg-slate-700 text-amber-300" : "text-slate-400"
+              !sameShape ? "bg-paper-400 text-navy-700" : "text-ink-600"
             }`}
           >
             實用按法
@@ -165,13 +165,13 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
           <button
             onClick={() => setSameShape(true)}
             className={`px-3 py-1.5 font-medium ${
-              sameShape ? "bg-slate-700 text-amber-300" : "text-slate-400"
+              sameShape ? "bg-paper-400 text-navy-700" : "text-ink-600"
             }`}
           >
             同把位對照（A 型）
           </button>
         </div>
-        <span className="text-xs text-slate-500">
+        <span className="text-xs text-ink-500">
           {sameShape
             ? "全部用第五弦根音的可移動手型停在同一把位——只有變動的音會移動，看清「其實只動一個音」。"
             : "顯示每個和弦最好按的實用手型（多為開放和弦）。"}
@@ -179,8 +179,8 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
       </div>
 
       {!sameShape && (
-        <p className="mb-4 rounded-lg border border-slate-800 bg-slate-900/60 p-3 text-xs leading-relaxed text-slate-400">
-          <span className="font-semibold text-amber-300">
+        <p className="mb-4 rounded-lg border border-line-200 bg-paper-100/60 p-3 text-xs leading-relaxed text-ink-600">
+          <span className="font-semibold text-navy-700">
             為什麼有些變化會換把位？
           </span>{" "}
           開放和弦（像 C）借用了空弦音，而空弦沒辦法「壓下去降半音」——開放 C
@@ -191,16 +191,16 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
         </p>
       )}
 
-      <div className="overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
+      <div className="overflow-hidden rounded-xl border border-line-200 bg-paper-100">
         {FAMILY_TIERS.map((tier) => (
           <div key={tier.label}>
-            <div className="border-y border-slate-800 bg-slate-950/70 px-4 py-2 first:border-t-0">
-              <span className="text-xs font-bold text-amber-300">
+            <div className="border-y border-line-200 bg-paper-200/70 px-4 py-2 first:border-t-0">
+              <span className="text-xs font-bold text-navy-700">
                 {tier.label}
               </span>
-              <span className="ml-2 text-xs text-slate-500">{tier.desc}</span>
+              <span className="ml-2 text-xs text-ink-500">{tier.desc}</span>
             </div>
-            <div className="divide-y divide-slate-800">
+            <div className="divide-y divide-line-200">
               {tier.qualities.map((quality) => {
                 const f = CHORD_FORMULAS[quality];
           const name = root + f.suffix;
@@ -216,23 +216,23 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
             <div
               key={f.quality}
               className={`flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 ${
-                active ? "bg-amber-500/10" : ""
+                active ? "bg-navy-700/10" : ""
               }`}
             >
               <button
                 onClick={() => playChord(shape, "strum")}
-                className="flex w-28 flex-col items-center rounded-lg bg-slate-800 px-2 py-1.5 transition-colors hover:bg-slate-700"
+                className="flex w-28 flex-col items-center rounded-lg bg-paper-300 px-2 py-1.5 transition-colors hover:bg-paper-400"
                 title="點擊試聽"
               >
-                <span className="font-bold text-amber-300">♪ {name}</span>
-                <span className="text-[10px] text-slate-500">
+                <span className="font-bold text-navy-700">♪ {name}</span>
+                <span className="text-[10px] text-ink-500">
                   {QUALITY_LABELS[f.quality]}
                 </span>
               </button>
 
               <button
                 onClick={() => playChord(shape, "strum")}
-                className="shrink-0 rounded-lg transition-colors hover:bg-slate-800/60"
+                className="shrink-0 rounded-lg transition-colors hover:bg-paper-300/60"
                 title={`${name} 按法，點擊試聽`}
               >
                 <ChordDiagram shape={shape} width={104} rootPc={rootPc} />
@@ -247,8 +247,8 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
                       key={s}
                       className={`flex w-11 flex-col items-center rounded-md px-1 py-1 ${
                         changed
-                          ? "bg-amber-500/20 text-amber-300 ring-1 ring-amber-500/50"
-                          : "bg-slate-800 text-slate-300"
+                          ? "bg-navy-700/20 text-navy-700 ring-1 ring-navy-700/50"
+                          : "bg-paper-300 text-ink-700"
                       }`}
                       title={iv.name}
                     >
@@ -263,23 +263,23 @@ export function ChordFamilySection({ root, currentQuality }: Props) {
                 })}
               </div>
 
-              <div className="min-w-48 flex-1 space-y-1 text-xs leading-relaxed text-slate-400">
+              <div className="min-w-48 flex-1 space-y-1 text-xs leading-relaxed text-ink-600">
                 <p>
-                  <span className="mr-1 font-semibold text-amber-300/90">
+                  <span className="mr-1 font-semibold text-navy-700/90">
                     怎麼變化
                   </span>
                   {f.changeText}
                 </p>
                 {jumpNote && (
                   <p>
-                    <span className="mr-1 font-semibold text-rose-300/90">
+                    <span className="mr-1 font-semibold text-blood-700/90">
                       為何換把位
                     </span>
                     {jumpNote}
                   </p>
                 )}
                 <p>
-                  <span className="mr-1 font-semibold text-sky-300/90">
+                  <span className="mr-1 font-semibold text-gold-700/90">
                     什麼時候用
                   </span>
                   {f.whenToUse}

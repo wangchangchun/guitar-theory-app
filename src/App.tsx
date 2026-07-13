@@ -71,14 +71,14 @@ export default function App() {
         consumePendingUnit: () => setPendingUnitId(null),
       }}
     >
-      <div className="min-h-screen bg-slate-950 text-slate-100">
-        <header className="border-b border-slate-800 bg-slate-900/70 backdrop-blur">
+      <div className="min-h-screen bg-paper-200 text-ink-900">
+        <header className="border-b border-line-200 bg-paper-100/70 backdrop-blur">
           <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-3 px-4 py-4">
             <button
               onClick={() => navigate("roadmap")}
               className="text-xl font-extrabold tracking-tight"
             >
-              🎸 搖滾吉他<span className="text-amber-400">樂理教室</span>
+              🎸 搖滾吉他<span className="text-navy-700">樂理教室</span>
             </button>
             <nav className="flex flex-wrap gap-1">
               {NAV_ITEMS.map((item) => (
@@ -87,8 +87,8 @@ export default function App() {
                   onClick={() => navigate(item.id)}
                   className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                     page === item.id
-                      ? "bg-amber-500 text-slate-950"
-                      : "bg-slate-800 text-amber-300 hover:bg-slate-700"
+                      ? "bg-navy-700 text-white"
+                      : "bg-paper-300 text-navy-700 hover:bg-paper-400"
                   }`}
                 >
                   {item.label}
@@ -102,7 +102,7 @@ export default function App() {
           <Page />
         </main>
 
-        <footer className="mx-auto max-w-6xl px-4 pb-8 text-center text-xs text-slate-600">
+        <footer className="mx-auto max-w-6xl px-4 pb-8 text-center text-xs text-ink-500">
           {FOOTNOTES[page]}
         </footer>
       </div>

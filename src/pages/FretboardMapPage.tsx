@@ -109,9 +109,9 @@ export function FretboardMapPage() {
       />
 
       {/* ① 指板音名與八度型 */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+      <div className="rounded-2xl border border-line-200 bg-paper-100 p-4">
         <h2 className="mb-2 text-lg font-bold">
-          ① 指板音名<span className="ml-2 text-sm font-normal text-slate-400">
+          ① 指板音名<span className="ml-2 text-sm font-normal text-ink-600">
             自然音（C 大調的音）分佈圖——先背第六弦與第五弦，其他用八度型推
           </span>
         </h2>
@@ -122,7 +122,7 @@ export function FretboardMapPage() {
           showDegrees={false}
           fretCount={12}
         />
-        <div className="mt-3 grid gap-x-6 gap-y-1 text-xs leading-relaxed text-slate-400 sm:grid-cols-2">
+        <div className="mt-3 grid gap-x-6 gap-y-1 text-xs leading-relaxed text-ink-600 sm:grid-cols-2">
           <p>・第 12 格回到空弦音名；第 5 格＝下一弦的空弦音（僅第三弦例外：第 4 格）</p>
           <p>・八度型（低音側）：隔一弦、往高音方向 +2 格（六→四弦、五→三弦）</p>
           <p>・八度型（高音側）：隔一弦 +3 格（四→二弦、三→一弦，因為跨過 B 弦）</p>
@@ -137,7 +137,7 @@ export function FretboardMapPage() {
 
       {/* 根音選擇（CAGED 與琶音共用） */}
       <div>
-        <h3 className="mb-2 text-sm font-semibold text-slate-300">
+        <h3 className="mb-2 text-sm font-semibold text-ink-700">
           根音（②③ 共用）
         </h3>
         <div className="flex flex-wrap gap-1.5">
@@ -147,8 +147,8 @@ export function FretboardMapPage() {
               onClick={() => setRoot(r)}
               className={`w-10 rounded-lg py-1.5 font-mono text-sm font-semibold transition-colors ${
                 root === r
-                  ? "bg-amber-500 text-slate-950"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  ? "bg-navy-700 text-white"
+                  : "bg-paper-300 text-ink-700 hover:bg-paper-400"
               }`}
             >
               {r}
@@ -158,11 +158,11 @@ export function FretboardMapPage() {
       </div>
 
       {/* ② CAGED */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+      <div className="rounded-2xl border border-line-200 bg-paper-100 p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-bold">
-            ② CAGED 五型：<span className="text-amber-400">{root} 和弦</span>
-            <span className="ml-2 text-sm font-normal text-slate-400">
+            ② CAGED 五型：<span className="text-navy-700">{root} 和弦</span>
+            <span className="ml-2 text-sm font-normal text-ink-600">
               同一個和弦鋪滿整個指板
             </span>
           </h2>
@@ -170,22 +170,22 @@ export function FretboardMapPage() {
             onClick={() =>
               playCaged(selForm === "all" ? positions[0].notes : activePos!.notes)
             }
-            className="rounded-lg bg-amber-500 px-4 py-1.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-amber-400"
+            className="rounded-lg bg-navy-700 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-navy-600"
           >
             ♪ 刷這個手型
           </button>
         </div>
 
         <div className="mb-3 flex flex-wrap items-center gap-1.5">
-          <span className="text-xs font-semibold text-slate-400">手型：</span>
+          <span className="text-xs font-semibold text-ink-600">手型：</span>
           {positions.map((p) => (
             <button
               key={p.form.form}
               onClick={() => setSelForm(p.form.form)}
               className={`rounded-lg px-3 py-1 text-xs font-semibold transition-colors ${
                 selForm === p.form.form
-                  ? "bg-amber-500 text-slate-950"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  ? "bg-navy-700 text-white"
+                  : "bg-paper-300 text-ink-700 hover:bg-paper-400"
               }`}
             >
               {p.form.form} 型・{p.offset === 0 ? "開放" : `${p.offset} 格`}
@@ -195,8 +195,8 @@ export function FretboardMapPage() {
             onClick={() => setSelForm("all")}
             className={`rounded-lg px-3 py-1 text-xs font-semibold transition-colors ${
               selForm === "all"
-                ? "bg-amber-500 text-slate-950"
-                : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                ? "bg-navy-700 text-white"
+                : "bg-paper-300 text-ink-700 hover:bg-paper-400"
             }`}
           >
             全部五型
@@ -211,11 +211,11 @@ export function FretboardMapPage() {
           pattern={cagedPattern}
           fretCount={cagedFretCount}
         />
-        <p className="mt-2 text-xs leading-relaxed text-slate-500">
+        <p className="mt-2 text-xs leading-relaxed text-ink-500">
           {selForm === "all" ? (
             <>
               五個手型依{" "}
-              <span className="font-mono text-amber-300">C→A→G→E→D</span>{" "}
+              <span className="font-mono text-navy-700">C→A→G→E→D</span>{" "}
               循環沿指板排好：
               {positions.map(
                 (p, i) =>
@@ -237,11 +237,11 @@ export function FretboardMapPage() {
       </div>
 
       {/* ③ 琶音與和弦內音 */}
-      <div className="rounded-2xl border border-slate-800 bg-slate-900 p-4">
+      <div className="rounded-2xl border border-line-200 bg-paper-100 p-4">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-bold">
-            ③ 琶音與和弦內音：<span className="text-sky-300">{arpName}</span>
-            <span className="ml-2 text-sm font-normal text-slate-400">
+            ③ 琶音與和弦內音：<span className="text-gold-700">{arpName}</span>
+            <span className="ml-2 text-sm font-normal text-ink-600">
               全指板的和弦內音地圖
             </span>
           </h2>
@@ -255,7 +255,7 @@ export function FretboardMapPage() {
                 ]),
               )
             }
-            className="rounded-lg bg-amber-500 px-4 py-1.5 text-sm font-semibold text-slate-950 transition-colors hover:bg-amber-400"
+            className="rounded-lg bg-navy-700 px-4 py-1.5 text-sm font-semibold text-white transition-colors hover:bg-navy-600"
           >
             ▶ 播放琶音
           </button>
@@ -268,8 +268,8 @@ export function FretboardMapPage() {
               onClick={() => setArpQuality(q)}
               className={`rounded-lg px-3 py-1 text-xs font-medium transition-colors ${
                 arpQuality === q
-                  ? "bg-amber-500 text-slate-950"
-                  : "bg-slate-800 text-slate-300 hover:bg-slate-700"
+                  ? "bg-navy-700 text-white"
+                  : "bg-paper-300 text-ink-700 hover:bg-paper-400"
               }`}
             >
               {root + CHORD_FORMULAS[q].suffix}（{QUALITY_LABELS[q]}）
@@ -283,25 +283,25 @@ export function FretboardMapPage() {
           degrees={arpDegrees}
           showDegrees
         />
-        <div className="mt-2 space-y-1 text-xs leading-relaxed text-slate-500">
+        <div className="mt-2 space-y-1 text-xs leading-relaxed text-ink-500">
           <p>
             {arpName} 的和弦內音＝{arpTones.join("·")}。solo
             時長音落在這些點上，怎麼停都貼和聲；音階的其他音當經過音快速通過。
           </p>
           <p>
-            🎯 <span className="font-semibold text-sky-300">Guide tones：</span>
+            🎯 <span className="font-semibold text-gold-700">Guide tones：</span>
             {hasSeventh ? (
               <>
-                3 音 <span className="font-mono text-amber-300">{arpTones[1]}</span>
+                3 音 <span className="font-mono text-navy-700">{arpTones[1]}</span>
                 （決定大小）與 7 音{" "}
-                <span className="font-mono text-amber-300">{arpTones[3]}</span>
+                <span className="font-mono text-navy-700">{arpTones[3]}</span>
                 （決定七和弦種類）——這兩個音一響，耳朵立刻知道現在是 {arpName}；
                 1 和 5 最安全，但說不出和弦的身分。
               </>
             ) : (
               <>
                 三和弦的身分由 3 音{" "}
-                <span className="font-mono text-amber-300">{arpTones[1]}</span>{" "}
+                <span className="font-mono text-navy-700">{arpTones[1]}</span>{" "}
                 決定——大調小調就差它半音。
               </>
             )}

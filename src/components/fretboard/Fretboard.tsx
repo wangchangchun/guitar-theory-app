@@ -97,9 +97,9 @@ export function Fretboard({
   }
 
   const dotFill = (degree: string) =>
-    degree === "1" ? "#f59e0b" : degree === "♭5" ? "#06b6d4" : "#475569";
+    degree === "1" ? "#1a3a6b" : degree === "♭5" ? "#684b13" : "#e6d0a8";
   const dotText = (degree: string) =>
-    degree === "1" || degree === "♭5" ? "#0f172a" : "#f1f5f9";
+    degree === "1" || degree === "♭5" ? "#ffffff" : "#231b10";
 
   // 把位底色範圍（把開放弦區也算進 from = 0 的把位）
   const windowRect = effectiveWindow
@@ -128,8 +128,8 @@ export function Fretboard({
           width={windowRect.width}
           height={gridH + 24}
           rx={8}
-          fill="#f59e0b"
-          opacity={0.08}
+          fill="#1a3a6b"
+          opacity={0.1}
         />
       )}
 
@@ -140,7 +140,7 @@ export function Fretboard({
           x={10}
           y={stringY(i) + 3.5}
           fontSize={10}
-          fill="#64748b"
+          fill="#5a4c30"
           textAnchor="middle"
         >
           {label}
@@ -148,7 +148,7 @@ export function Fretboard({
       ))}
 
       {/* 琴枕 */}
-      <rect x={left - 3} y={top - 4} width={5} height={gridH + 8} rx={2} fill="#e2e8f0" />
+      <rect x={left - 3} y={top - 4} width={5} height={gridH + 8} rx={2} fill="#231b10" />
 
       {/* 琴格直線 */}
       {Array.from({ length: FRETS }, (_, i) => (
@@ -158,7 +158,7 @@ export function Fretboard({
           x2={left + (i + 1) * fretW}
           y1={top}
           y2={top + gridH}
-          stroke="#475569"
+          stroke="#765f40"
           strokeWidth={1}
         />
       ))}
@@ -171,7 +171,7 @@ export function Fretboard({
           x2={left + gridW}
           y1={stringY(i)}
           y2={stringY(i)}
-          stroke="#94a3b8"
+          stroke="#5a4c30"
           strokeWidth={1.9 - i * 0.2}
         />
       ))}
@@ -183,11 +183,11 @@ export function Fretboard({
           cx={left + (f - 0.5) * fretW}
           cy={top + gridH / 2}
           r={4.5}
-          fill="#334155"
+          fill="#ab873f"
         />
       ))}
-      <circle cx={left + 11.5 * fretW} cy={top + gridH / 2 - stringGap} r={4.5} fill="#334155" />
-      <circle cx={left + 11.5 * fretW} cy={top + gridH / 2 + stringGap} r={4.5} fill="#334155" />
+      <circle cx={left + 11.5 * fretW} cy={top + gridH / 2 - stringGap} r={4.5} fill="#ab873f" />
+      <circle cx={left + 11.5 * fretW} cy={top + gridH / 2 + stringGap} r={4.5} fill="#ab873f" />
 
       {/* 琴格數字 */}
       {FRET_NUMBERS.filter((f) => f <= FRETS).map((f) => (
@@ -196,7 +196,7 @@ export function Fretboard({
           x={left + (f - 0.5) * fretW}
           y={top + gridH + 24}
           fontSize={11}
-          fill="#64748b"
+          fill="#5a4c30"
           textAnchor="middle"
         >
           {f}

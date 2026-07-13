@@ -39,9 +39,9 @@ function saveMap(key: string, map: Record<string, boolean>) {
 }
 
 const LEVEL_STYLES: Record<LessonLevel, string> = {
-  入門: "bg-emerald-500/15 text-emerald-300",
-  進階: "bg-amber-500/15 text-amber-300",
-  挑戰: "bg-rose-500/15 text-rose-300",
+  入門: "bg-olive-700/15 text-olive-700",
+  進階: "bg-navy-700/15 text-navy-700",
+  挑戰: "bg-blood-700/15 text-blood-700",
 };
 
 interface Props {
@@ -84,28 +84,28 @@ export function PageIntro({ storageKey, phase, what, lessons, notes }: Props) {
   };
 
   return (
-    <section className="rounded-2xl border border-amber-500/25 bg-amber-500/[0.06] p-5">
+    <section className="rounded-2xl border border-navy-700/25 bg-navy-700/[0.06] p-5">
       <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
         <div className="flex items-center gap-2.5">
-          <span className="font-mono text-xs font-bold uppercase tracking-wider text-amber-400">
+          <span className="font-mono text-xs font-bold uppercase tracking-wider text-navy-700">
             學習清單
           </span>
           <button
             onClick={() => navigate("roadmap")}
-            className="rounded-full bg-amber-500/15 px-2.5 py-0.5 text-[11px] font-medium text-amber-300 transition-colors hover:bg-amber-500/25"
+            className="rounded-full bg-navy-700/15 px-2.5 py-0.5 text-[11px] font-medium text-navy-700 transition-colors hover:bg-navy-700/25"
             title="回到學習路線總覽"
           >
             {phase} ↗
           </button>
         </div>
         <div className="flex items-center gap-3">
-          <span className="font-mono text-xs text-slate-400">
-            完成 <span className="font-bold text-emerald-400">{doneCount}</span>
+          <span className="font-mono text-xs text-ink-600">
+            完成 <span className="font-bold text-olive-700">{doneCount}</span>
             /{lessons.length}
           </span>
           <button
             onClick={toggleCollapsed}
-            className="shrink-0 text-xs font-medium text-slate-400 transition-colors hover:text-amber-300"
+            className="shrink-0 text-xs font-medium text-ink-600 transition-colors hover:text-navy-700"
           >
             {collapsed ? "展開 ▾" : "收合 ▴"}
           </button>
@@ -114,8 +114,8 @@ export function PageIntro({ storageKey, phase, what, lessons, notes }: Props) {
 
       {!collapsed && (
         <>
-          <p className="mt-2.5 text-sm leading-relaxed text-slate-300">{what}</p>
-          <p className="mt-1 text-xs text-slate-500">
+          <p className="mt-2.5 text-sm leading-relaxed text-ink-700">{what}</p>
+          <p className="mt-1 text-xs text-ink-500">
             由淺入深照順序做，每一步都有可以直接上琴的實作——做完就打勾。
           </p>
 
@@ -127,8 +127,8 @@ export function PageIntro({ storageKey, phase, what, lessons, notes }: Props) {
                   key={i}
                   className={`rounded-xl border p-3 transition-colors ${
                     isDone
-                      ? "border-emerald-600/40 bg-emerald-950/20"
-                      : "border-slate-800 bg-slate-950/40"
+                      ? "border-olive-700/40 bg-olive-700/20"
+                      : "border-line-200 bg-paper-200/40"
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -137,15 +137,15 @@ export function PageIntro({ storageKey, phase, what, lessons, notes }: Props) {
                       aria-label={isDone ? "取消完成" : "標記完成"}
                       className={`mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border text-[11px] font-bold transition-colors ${
                         isDone
-                          ? "border-emerald-500 bg-emerald-500 text-slate-950"
-                          : "border-slate-600 text-transparent hover:border-emerald-400"
+                          ? "border-olive-700 bg-olive-700 text-white"
+                          : "border-line-300 text-transparent hover:border-olive-700"
                       }`}
                     >
                       ✓
                     </button>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="font-mono text-[11px] text-slate-500">
+                        <span className="font-mono text-[11px] text-ink-500">
                           {i + 1}
                         </span>
                         <span
@@ -155,20 +155,20 @@ export function PageIntro({ storageKey, phase, what, lessons, notes }: Props) {
                         </span>
                         <span
                           className={`text-sm font-semibold ${
-                            isDone ? "text-slate-400" : "text-slate-100"
+                            isDone ? "text-ink-600" : "text-ink-900"
                           }`}
                         >
                           {step.title}
                         </span>
                       </div>
-                      <p className="mt-1 text-xs leading-relaxed text-slate-300">
+                      <p className="mt-1 text-xs leading-relaxed text-ink-700">
                         {step.learn}
                       </p>
                       <p className="mt-1 text-xs leading-relaxed">
-                        <span className="mr-1 font-semibold text-sky-300">
+                        <span className="mr-1 font-semibold text-gold-700">
                           🎸 上琴
                         </span>
-                        <span className="text-slate-400">{step.guitar}</span>
+                        <span className="text-ink-600">{step.guitar}</span>
                       </p>
                       {step.chords && step.chords.length > 0 && (
                         <ChordStrip
@@ -184,9 +184,9 @@ export function PageIntro({ storageKey, phase, what, lessons, notes }: Props) {
           </ol>
 
           {notes && notes.length > 0 && (
-            <ul className="mt-4 flex flex-col gap-1 border-t border-amber-500/15 pt-3">
+            <ul className="mt-4 flex flex-col gap-1 border-t border-navy-700/15 pt-3">
               {notes.map((n, i) => (
-                <li key={i} className="text-xs leading-relaxed text-slate-400">
+                <li key={i} className="text-xs leading-relaxed text-ink-600">
                   ・{n}
                 </li>
               ))}

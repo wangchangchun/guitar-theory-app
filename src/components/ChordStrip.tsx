@@ -27,10 +27,10 @@ export function ChordStrip({ chords, movable = false, width = 68 }: Props) {
           <button
             key={name}
             onClick={() => playChord(shape, "strum")}
-            className="flex flex-col items-center rounded-lg border border-slate-800 bg-slate-900/80 px-1.5 pt-1 transition-colors hover:border-amber-500/60"
+            className="flex flex-col items-center rounded-lg border border-line-200 bg-paper-100/80 px-1.5 pt-1 transition-colors hover:border-navy-700/60"
             title={`${name} 按法，點擊試聽`}
           >
-            <span className="text-[11px] font-bold leading-none text-amber-300">
+            <span className="text-[11px] font-bold leading-none text-navy-700">
               ♪ {name}
             </span>
             <ChordDiagram shape={shape} width={width} />

@@ -81,9 +81,9 @@ const PHASES: Phase[] = [
 ];
 
 const STATUS_BADGE = {
-  mastered: { label: "✓ 已精通", cls: "bg-emerald-600/30 text-emerald-300" },
-  practicing: { label: "練習中", cls: "bg-slate-700 text-slate-300" },
-  untouched: { label: "未挑戰", cls: "bg-slate-800 text-slate-500" },
+  mastered: { label: "✓ 已精通", cls: "bg-olive-700/30 text-olive-700" },
+  practicing: { label: "練習中", cls: "bg-paper-400 text-ink-700" },
+  untouched: { label: "未挑戰", cls: "bg-paper-300 text-ink-500" },
 } as const;
 
 export function RoadmapPage() {
@@ -106,25 +106,25 @@ export function RoadmapPage() {
   return (
     <div className="mx-auto max-w-4xl">
       {/* 標題 */}
-      <div className="mb-6 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-        <p className="mb-1 font-mono text-xs uppercase tracking-wider text-amber-400">
+      <div className="mb-6 rounded-2xl border border-line-200 bg-paper-100 p-6">
+        <p className="mb-1 font-mono text-xs uppercase tracking-wider text-navy-700">
           學習路線圖
         </p>
-        <h1 className="mb-2 text-2xl font-extrabold text-slate-100">
+        <h1 className="mb-2 text-2xl font-extrabold text-ink-900">
           從一個音，到一整首歌
         </h1>
-        <p className="mb-4 text-sm leading-relaxed text-slate-400">
+        <p className="mb-4 text-sm leading-relaxed text-ink-600">
           7 個內容頁與 12 個練習單元排成 5 個階段。每個頁面與單元都可以直接點進去——
           照著走一遍，就是一套完整的自學課表。每次 15–20 分鐘就好。
         </p>
         <div className="flex items-center gap-3">
-          <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-800">
+          <div className="h-2 flex-1 overflow-hidden rounded-full bg-paper-300">
             <div
-              className="h-full bg-emerald-500 transition-all"
+              className="h-full bg-olive-700 transition-all"
               style={{ width: `${pct}%` }}
             />
           </div>
-          <span className="shrink-0 font-mono text-xs text-slate-400">
+          <span className="shrink-0 font-mono text-xs text-ink-600">
             {masteredCount} / {PRACTICE_UNITS.length} 單元精通
           </span>
         </div>
@@ -140,12 +140,12 @@ export function RoadmapPage() {
         ].map(([mark, text]) => (
           <div
             key={mark}
-            className="rounded-xl border border-slate-800 bg-slate-900/60 p-3"
+            className="rounded-xl border border-line-200 bg-paper-100/60 p-3"
           >
-            <p className="mb-1 font-mono text-[11px] font-semibold text-amber-400">
+            <p className="mb-1 font-mono text-[11px] font-semibold text-navy-700">
               {mark}
             </p>
-            <p className="text-xs leading-relaxed text-slate-400">{text}</p>
+            <p className="text-xs leading-relaxed text-ink-600">{text}</p>
           </div>
         ))}
       </div>
@@ -155,27 +155,27 @@ export function RoadmapPage() {
         {PHASES.map((phase) => (
           <section
             key={phase.index}
-            className="rounded-2xl border border-slate-800 bg-slate-900 p-5"
+            className="rounded-2xl border border-line-200 bg-paper-100 p-5"
           >
             <div className="mb-3 flex items-baseline gap-3">
-              <span className="font-mono text-2xl font-bold text-slate-600">
+              <span className="font-mono text-2xl font-bold text-ink-500">
                 {phase.index}
               </span>
               <div>
-                <h2 className="text-lg font-bold text-slate-100">
+                <h2 className="text-lg font-bold text-ink-900">
                   {phase.title}
                 </h2>
-                <p className="font-mono text-[11px] text-slate-500">
+                <p className="font-mono text-[11px] text-ink-500">
                   {phase.time}
                 </p>
               </div>
             </div>
-            <p className="mb-4 text-sm leading-relaxed text-slate-400">
+            <p className="mb-4 text-sm leading-relaxed text-ink-600">
               {phase.goal}
             </p>
 
             {/* 內容頁連結 */}
-            <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+            <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-ink-500">
               內容頁
             </p>
             <div className="mb-4 flex flex-wrap gap-2">
@@ -183,7 +183,7 @@ export function RoadmapPage() {
                 <button
                   key={c.page + c.label}
                   onClick={() => navigate(c.page)}
-                  className="rounded-lg border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-medium text-amber-300 transition-colors hover:border-amber-500 hover:bg-slate-700"
+                  className="rounded-lg border border-line-200 bg-paper-300 px-3 py-1.5 text-xs font-medium text-navy-700 transition-colors hover:border-navy-700 hover:bg-paper-400"
                 >
                   {c.label} →
                 </button>
@@ -193,7 +193,7 @@ export function RoadmapPage() {
             {/* 練習單元連結 */}
             {phase.units.length > 0 ? (
               <>
-                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-ink-500">
                   練習單元（依序精通）
                 </p>
                 <div className="mb-4 flex flex-col gap-1.5">
@@ -206,9 +206,9 @@ export function RoadmapPage() {
                       <button
                         key={id}
                         onClick={() => navigate("practice", id)}
-                        className="flex items-center justify-between gap-2 rounded-lg border border-slate-800 bg-slate-950/40 px-3 py-2 text-left transition-colors hover:border-slate-600"
+                        className="flex items-center justify-between gap-2 rounded-lg border border-line-200 bg-paper-200/40 px-3 py-2 text-left transition-colors hover:border-line-300"
                       >
-                        <span className="text-sm text-slate-200">
+                        <span className="text-sm text-ink-900">
                           {meta.emoji} 單元 {meta.no}｜{meta.title}
                         </span>
                         <span
@@ -223,17 +223,17 @@ export function RoadmapPage() {
               </>
             ) : (
               <div className="mb-4">
-                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                <p className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-ink-500">
                   最終驗收
                 </p>
                 <button
                   onClick={() => navigate("practice")}
-                  className="flex w-full items-center justify-between gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-left transition-colors hover:border-amber-400"
+                  className="flex w-full items-center justify-between gap-2 rounded-lg border border-navy-700/40 bg-navy-700/10 px-3 py-2 text-left transition-colors hover:border-navy-700"
                 >
-                  <span className="text-sm text-amber-300">
+                  <span className="text-sm text-navy-700">
                     🏆 綜合測驗（12 單元全精通解鎖）
                   </span>
-                  <span className="shrink-0 font-mono text-[10px] text-slate-400">
+                  <span className="shrink-0 font-mono text-[10px] text-ink-600">
                     {masteredCount === PRACTICE_UNITS.length ? "已解鎖" : `還差 ${PRACTICE_UNITS.length - masteredCount}`}
                   </span>
                 </button>
@@ -241,15 +241,15 @@ export function RoadmapPage() {
             )}
 
             {/* 代表上琴練習 */}
-            <p className="border-l-2 border-sky-500/60 pl-3 text-xs leading-relaxed text-slate-400">
-              <span className="font-semibold text-sky-300">🎸 代表練習　</span>
+            <p className="border-l-2 border-gold-700/60 pl-3 text-xs leading-relaxed text-ink-600">
+              <span className="font-semibold text-gold-700">🎸 代表練習　</span>
               {phase.drill}
             </p>
           </section>
         ))}
       </div>
 
-      <p className="mt-6 text-center text-xs leading-relaxed text-slate-500">
+      <p className="mt-6 text-center text-xs leading-relaxed text-ink-500">
         先把「和弦地基」四個單元練到全綠，再往下走——地基不穩，後面會很卡。
         不用等滿分，80% 就走下一階段。
       </p>
