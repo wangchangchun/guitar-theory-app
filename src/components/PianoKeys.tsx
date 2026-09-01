@@ -87,11 +87,12 @@ export function PianoKeys({ fromMidi = 48, semitones = 25, marks = [] }: Props) 
               stroke="#765f40"
               strokeWidth={1}
             />
+            {/* 根音圈：圈住音名本身（圓心對齊文字視覺中心，避免和字重疊） */}
             {mark?.ring && (
               <circle
                 cx={x + (W - 1.5) / 2}
-                cy={WH - 22}
-                r={8.5}
+                cy={WH - 11.5}
+                r={10}
                 fill="none"
                 stroke={ringStroke}
                 strokeWidth={2.5}
@@ -137,8 +138,8 @@ export function PianoKeys({ fromMidi = 48, semitones = 25, marks = [] }: Props) 
               {mark?.ring && (
                 <circle
                   cx={x + BW / 2}
-                  cy={BH - 20}
-                  r={6.5}
+                  cy={BH - 9.5}
+                  r={8}
                   fill="none"
                   stroke="#ffffff"
                   strokeWidth={2}
